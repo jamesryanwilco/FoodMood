@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "FoodMoodV2",
-    "slug": "FoodMoodV2",
+    "name": "The Check-In",
+    "slug": "TheCheckIn",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
