@@ -1,13 +1,16 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Ionicons name="leaf-outline" size={36} color="#4A5C4D" style={styles.icon} />
-        <Text style={styles.title}>Food & Mood</Text>
+        <Image
+          source={require('../../assets/splash-icon.png')}
+          style={styles.logo}
+        />
+        <Text style={styles.title}>The Check-In</Text>
+        <Text style={styles.subtitle}>A Mindful Eating App</Text>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -33,13 +36,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  icon: {
+  logo: {
+    width: 120,
+    height: 120,
     marginBottom: 20,
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 42,
     fontFamily: 'serif',
     fontWeight: '600',
+    color: '#4A5C4D',
+    textAlign: 'center',
+  },
+  subtitle: {
+    marginTop: 10,
+    fontSize: 18,
+    fontFamily: 'serif',
     color: '#4A5C4D',
     textAlign: 'center',
   },

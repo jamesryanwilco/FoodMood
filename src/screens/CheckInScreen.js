@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
-import { ArrowUpTrayIcon, CogIcon } from 'react-native-heroicons/outline';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 
 const iconColor = '#4A5C4D';
@@ -40,15 +39,6 @@ export default function CheckInScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity>
-                    <ArrowUpTrayIcon size={28} color={iconColor} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <CogIcon size={28} color={iconColor} />
-                </TouchableOpacity>
-            </View>
-
             <View style={styles.content}>
                 <Text style={styles.title}>How are you feeling?</Text>
                 
@@ -95,17 +85,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5F5E9',
         justifyContent: 'space-between',
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingTop: 60,
-        paddingHorizontal: 20,
-    },
     content: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingBottom: 80,
     },
     title: {
         fontSize: 36,
