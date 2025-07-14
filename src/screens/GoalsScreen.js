@@ -12,9 +12,9 @@ export default function GoalsScreen({ navigation }) {
       </Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('SelectGoals')}
+        onPress={() => navigation.navigate('ViewGoals')}
       >
-        <Text style={styles.buttonText}>Set My Intentions</Text>
+        <Text style={styles.buttonText}>Review Goals</Text>
       </TouchableOpacity>
     </View>
   );

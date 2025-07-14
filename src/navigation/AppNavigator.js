@@ -12,6 +12,7 @@ import Phase2_Step1_ExperienceScreen from '../screens/checkin/Phase2_Step1_Exper
 import Phase2_Step1a_EmotionScreen from '../screens/checkin/Phase2_Step1a_EmotionScreen';
 import Phase2_Step2_GoalScreen from '../screens/checkin/Phase2_Step2_GoalScreen';
 import SelectGoalsScreen from '../screens/SelectGoalsScreen';
+import ViewGoalsScreen from '../screens/ViewGoalsScreen';
 
 const Stack = createStackNavigator();
 
@@ -34,7 +35,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -44,7 +46,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -54,7 +57,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -64,7 +68,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -74,7 +79,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -84,7 +90,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -94,7 +101,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -104,7 +112,8 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
       <Stack.Screen 
@@ -114,7 +123,18 @@ export default function AppNavigator() {
           headerShown: true, 
           headerTransparent: true, 
           headerTitle: '', 
-          headerBackTitle: 'Back' 
+          headerBackVisible: false, 
+        }} 
+      />
+      <Stack.Screen 
+        name="ViewGoals" 
+        component={ViewGoalsScreen} 
+        options={{ 
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: '',
+          headerBackTitleVisible: false,
+          headerTintColor: '#4A5C4D',
         }} 
       />
     </Stack.Navigator>

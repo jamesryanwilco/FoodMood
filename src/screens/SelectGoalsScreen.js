@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const GOALS_STORAGE_KEY = 'user_goals';
 
@@ -38,8 +38,10 @@ const goalsData = [
 ];
 
 export default function GoalsScreen() {
+    const navigation = useNavigation();
     const [selectedGoals, setSelectedGoals] = useState([]);
     const [customGoal, setCustomGoal] = useState('');
+    const [expandedSections, setExpandedSections] = useState({});
 
     const loadGoals = async () => {
         try {
@@ -63,11 +65,20 @@ export default function GoalsScreen() {
         setSelectedGoals(newSelectedGoals);
     };
 
+    const toggleSection = (category) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [category]: !prev[category]
+        }));
+    };
+
     const handleSave = async () => {
         try {
             const dataToStore = JSON.stringify({ selected: selectedGoals, custom: customGoal });
             await AsyncStorage.setItem(GOALS_STORAGE_KEY, dataToStore);
-            Alert.alert('Saved!', 'Your intentions have been saved.');
+            Alert.alert('Saved!', 'Your intentions have been saved.', [
+                { text: 'OK', onPress: () => navigation.goBack() }
+            ]);
         } catch (e) {
             Alert.alert('Error', 'Failed to save your intentions.');
             console.error(e);
@@ -75,44 +86,56 @@ export default function GoalsScreen() {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>What matters most to you right now?</Text>
-            <Text style={styles.subtitle}>Choose what resonates with you. You can always change this later.</Text>
+        <View style={styles.container}>
+            <ScrollView style={styles.scrollContainer}>
+                <Text style={styles.title}>What matters most to you right now?</Text>
+                <Text style={styles.subtitle}>Choose what resonates with you. You can always change this later.</Text>
 
-            {goalsData.map(section => (
-                <View key={section.category} style={styles.section}>
-                    <Text style={styles.sectionTitle}>{section.emoji} {section.category}</Text>
-                    {section.items.map(item => (
-                        <TouchableOpacity
-                            key={item}
-                            style={[styles.goalButton, selectedGoals.includes(item) && styles.goalButtonSelected]}
-                            onPress={() => handleSelectGoal(item)}
-                        >
-                            <Text style={[styles.goalText, selectedGoals.includes(item) && styles.goalTextSelected]}>{item}</Text>
+                {goalsData.map(section => (
+                    <View key={section.category} style={styles.section}>
+                        <TouchableOpacity onPress={() => toggleSection(section.category)} style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>{section.emoji} {section.category}</Text>
+                            <Text style={styles.sectionToggle}>{expandedSections[section.category] ? '−' : '+'}</Text>
                         </TouchableOpacity>
-                    ))}
+                        {expandedSections[section.category] && section.items.map(item => {
+                            const isSelected = selectedGoals.includes(item);
+                            const medalIndex = selectedGoals.indexOf(item);
+                            const medal = ['🥇', '🥈', '🥉'][medalIndex];
+
+                            return (
+                                <TouchableOpacity
+                                    key={item}
+                                    style={[styles.goalButton, isSelected && styles.goalButtonSelected]}
+                                    onPress={() => handleSelectGoal(item)}
+                                >
+                                    <View style={styles.goalContent}>
+                                        {isSelected && medal ? <Text style={styles.medal}>{medal}</Text> : null}
+                                        <Text style={[styles.goalText, isSelected && styles.goalTextSelected]}>{item}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                ))}
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>✍️ Write your own intention (optional)</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="I want to..."
+                        placeholderTextColor="#AAB8C2"
+                        value={customGoal}
+                        onChangeText={setCustomGoal}
+                    />
                 </View>
-            ))}
+            </ScrollView>
 
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>✍️ Write your own intention (optional)</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="I want to..."
-                    placeholderTextColor="#AAB8C2"
-                    value={customGoal}
-                    onChangeText={setCustomGoal}
-                />
+            <View style={styles.footer}>
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <Text style={styles.saveButtonText}>Save My Intentions</Text>
+                </TouchableOpacity>
             </View>
-
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.saveButtonText}>Save My Intentions</Text>
-            </TouchableOpacity>
-            
-            <Text style={styles.footerText}>
-                There's no right way to do this. Just showing up is a win. You're here — that's what matters.
-            </Text>
-        </ScrollView>
+        </View>
     );
 }
 
@@ -120,8 +143,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5F5E9',
-        padding: 20,
-        paddingTop: 80,
+    },
+    scrollContainer: {
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingTop: 100,
     },
     title: {
         fontSize: 28,
@@ -148,6 +174,17 @@ const styles = StyleSheet.create({
         color: '#4A5C4D',
         marginBottom: 15,
     },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    sectionToggle: {
+        fontSize: 28,
+        color: '#4A5C4D',
+        fontWeight: '300',
+    },
     goalButton: {
         backgroundColor: '#FFFFFF',
         padding: 20,
@@ -155,6 +192,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#E0E0E0',
         marginBottom: 10,
+    },
+    goalContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    medal: {
+        fontSize: 20,
+        marginRight: 10,
     },
     goalButtonSelected: {
         backgroundColor: '#4A5C4D',
@@ -183,7 +228,6 @@ const styles = StyleSheet.create({
         paddingVertical: 18,
         borderRadius: 12,
         alignItems: 'center',
-        marginBottom: 20,
     },
     saveButtonText: {
         color: '#FFFFFF',
@@ -197,5 +241,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 40,
         fontStyle: 'italic',
+    },
+    footer: {
+        paddingTop: 20,
+        paddingHorizontal: 20,
+        paddingBottom: 60,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+        backgroundColor: '#F5F5E9',
     },
 }); 

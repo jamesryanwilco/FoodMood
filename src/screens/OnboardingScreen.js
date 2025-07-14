@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CommonActions } from '@react-navigation/native';
 import {
     AcademicCapIcon,
     EyeIcon,
@@ -15,6 +16,8 @@ import {
     ArrowLeftCircleIcon,
     ChartBarIcon,
     RocketLaunchIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon,
 } from 'react-native-heroicons/outline';
 
 const iconColor = '#4A5C4D';
@@ -88,7 +91,7 @@ const OnboardingPage2 = () => (
     </ScrollView>
 );
 
-const OnboardingPage3 = () => (
+const OnboardingPage3 = ({ onComplete }) => (
     <ScrollView contentContainerStyle={styles.page}>
         <View style={styles.titleContainer}>
             <RocketLaunchIcon size={32} color={iconColor} style={styles.titleIcon} />
@@ -100,6 +103,9 @@ const OnboardingPage3 = () => (
         <Text style={styles.pageText}>
             Choose a focus that feels realistic and personal.
         </Text>
+        <TouchableOpacity style={[styles.navButton, { marginTop: 40 }]} onPress={onComplete}>
+            <Text style={styles.buttonText}>Set My Intentions</Text>
+        </TouchableOpacity>
     </ScrollView>
 );
 
@@ -107,23 +113,34 @@ export default function OnboardingScreen({ navigation }) {
     const pagerRef = useRef(null);
     const [currentPage, setCurrentPage] = useState(0);
 
-    const completeOnboarding = async () => {
+    const handleComplete = async () => {
         try {
             await AsyncStorage.setItem('onboarding_completed', 'true');
-            navigation.replace('Main');
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 1,
+                    routes: [
+                        { name: 'Main' },
+                        { name: 'SelectGoals' },
+                    ],
+                })
+            );
         } catch (e) {
-            console.error('Failed to save onboarding status.', e);
-            // Still navigate, but log the error
+            console.error('Failed to save onboarding status or navigate.', e);
+            // Fallback navigation
             navigation.replace('Main');
         }
     };
 
-    const handleComplete = () => {
-        completeOnboarding();
-    };
-
-    const handleSkip = () => {
-        completeOnboarding();
+    const handleSkip = async () => {
+        try {
+            await AsyncStorage.setItem('onboarding_completed', 'true');
+            navigation.replace('Main');
+        } catch (e) {
+            console.error('Failed to save onboarding status on skip.', e);
+            // Still navigate, but log the error
+            navigation.replace('Main');
+        }
     };
 
     const handleNext = () => {
@@ -154,30 +171,26 @@ export default function OnboardingScreen({ navigation }) {
                     <OnboardingPage2 />
                 </View>
                 <View key="3">
-                    <OnboardingPage3 />
+                    <OnboardingPage3 onComplete={handleComplete} />
                 </View>
             </PagerView>
 
-            <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-                <Text style={styles.skipButtonText}>Skip for Now</Text>
-            </TouchableOpacity>
-
             <View style={styles.navigationContainer}>
                 {currentPage > 0 ? (
-                    <TouchableOpacity style={styles.navButton} onPress={handleBack}>
-                        <Text style={styles.buttonText}>Back</Text>
+                    <TouchableOpacity style={styles.arrowButton} onPress={handleBack}>
+                        <ArrowLeftIcon size={30} color={iconColor} />
                     </TouchableOpacity>
                 ) : <View style={styles.navButtonPlaceholder} /> }
 
+                <TouchableOpacity onPress={handleSkip}>
+                    <Text style={styles.skipButtonText}>Skip</Text>
+                </TouchableOpacity>
+
                 {currentPage < 2 ? (
-                    <TouchableOpacity style={styles.navButton} onPress={handleNext}>
-                        <Text style={styles.buttonText}>Next</Text>
+                    <TouchableOpacity style={styles.arrowButton} onPress={handleNext}>
+                        <ArrowRightIcon size={30} color={iconColor} />
                     </TouchableOpacity>
-                ) : (
-                    <TouchableOpacity style={styles.navButton} onPress={handleComplete}>
-                        <Text style={styles.buttonText}>Finish</Text>
-                    </TouchableOpacity>
-                )}
+                ) : <View style={styles.navButtonPlaceholder} />}
             </View>
         </View>
     );
@@ -267,26 +280,29 @@ const styles = StyleSheet.create({
         paddingHorizontal: 40,
         borderRadius: 12,
         alignItems: 'center',
+        minWidth: 120,
+    },
+    arrowButton: {
+        padding: 10,
     },
     navButtonPlaceholder: {
-        width: 120,
-        paddingHorizontal: 40,
-        paddingVertical: 15,
+        width: 50, // width of arrowButton
+        padding: 10,
     },
     buttonText: {
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
     },
-    skipButton: {
-        position: 'absolute',
-        top: 60,
-        right: 20,
-        padding: 10,
+    skipContainer: {
+        alignItems: 'center',
+        paddingVertical: 10,
+        backgroundColor: '#F5F5E9',
     },
     skipButtonText: {
-        color: '#4A5C4D',
+        color: '#FF6B6B',
         fontSize: 16,
         fontFamily: 'serif',
+        fontWeight: 'bold',
     },
 }); 
