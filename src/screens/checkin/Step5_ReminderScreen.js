@@ -32,7 +32,8 @@ export default function Step5_ReminderScreen({ navigation }) {
 
             await AsyncStorage.setItem('pending_entries', JSON.stringify(entries));
             
-            // Schedule the notification
+            // Schedule the notification with a specific date
+            const triggerDate = new Date(Date.now() + reminderMinutes * 60 * 1000);
             await Notifications.scheduleNotificationAsync({
                 content: {
                     title: "Meal Reminder",
@@ -40,7 +41,8 @@ export default function Step5_ReminderScreen({ navigation }) {
                     data: { entryId: pendingEntry.id },
                 },
                 trigger: {
-                    seconds: reminderMinutes * 60,
+                    type: 'date',
+                    date: triggerDate,
                 },
             });
 
