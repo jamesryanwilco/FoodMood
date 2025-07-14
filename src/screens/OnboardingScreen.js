@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import PagerView from 'react-native-pager-view';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     AcademicCapIcon,
     EyeIcon,
@@ -106,8 +107,23 @@ export default function OnboardingScreen({ navigation }) {
     const pagerRef = useRef(null);
     const [currentPage, setCurrentPage] = useState(0);
 
+    const completeOnboarding = async () => {
+        try {
+            await AsyncStorage.setItem('onboarding_completed', 'true');
+            navigation.replace('Main');
+        } catch (e) {
+            console.error('Failed to save onboarding status.', e);
+            // Still navigate, but log the error
+            navigation.replace('Main');
+        }
+    };
+
     const handleComplete = () => {
-        navigation.replace('Main');
+        completeOnboarding();
+    };
+
+    const handleSkip = () => {
+        completeOnboarding();
     };
 
     const handleNext = () => {
@@ -141,6 +157,11 @@ export default function OnboardingScreen({ navigation }) {
                     <OnboardingPage3 />
                 </View>
             </PagerView>
+
+            <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+                <Text style={styles.skipButtonText}>Skip for Now</Text>
+            </TouchableOpacity>
+
             <View style={styles.navigationContainer}>
                 {currentPage > 0 ? (
                     <TouchableOpacity style={styles.navButton} onPress={handleBack}>
@@ -256,5 +277,16 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    skipButton: {
+        position: 'absolute',
+        top: 60,
+        right: 20,
+        padding: 10,
+    },
+    skipButtonText: {
+        color: '#4A5C4D',
+        fontSize: 16,
+        fontFamily: 'serif',
     },
 }); 

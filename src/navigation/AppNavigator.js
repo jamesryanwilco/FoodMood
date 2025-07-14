@@ -11,6 +11,7 @@ import Step5_ReminderScreen from '../screens/checkin/Step5_ReminderScreen';
 import Phase2_Step1_ExperienceScreen from '../screens/checkin/Phase2_Step1_ExperienceScreen';
 import Phase2_Step1a_EmotionScreen from '../screens/checkin/Phase2_Step1a_EmotionScreen';
 import Phase2_Step2_GoalScreen from '../screens/checkin/Phase2_Step2_GoalScreen';
+import SelectGoalsScreen from '../screens/SelectGoalsScreen';
 
 const Stack = createStackNavigator();
 
@@ -99,6 +100,16 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="CompleteStep2" 
         component={Phase2_Step2_GoalScreen} 
+        options={{ 
+          headerShown: true, 
+          headerTransparent: true, 
+          headerTitle: '', 
+          headerBackTitle: 'Back' 
+        }} 
+      />
+      <Stack.Screen 
+        name="SelectGoals" 
+        component={SelectGoalsScreen} 
         options={{ 
           headerShown: true, 
           headerTransparent: true, 

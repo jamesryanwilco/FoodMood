@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WelcomeScreen({ navigation }) {
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      try {
+        const value = await AsyncStorage.getItem('onboarding_completed');
+        if (value !== null) {
+          navigation.replace('Main');
+        }
+      } catch (e) {
+        console.error('Failed to check onboarding status.', e);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
