@@ -43,7 +43,7 @@ export default function Phase2_Step1_ExperienceScreen({ navigation, route }) {
             <Text style={styles.title}>How was the experience?</Text>
 
             <LevelGauge
-                label="Mindfulness"
+                label="Presence"
                 icon={<SparklesIcon size={32} color={iconColor} />}
                 value={mindfulness}
                 onValueChange={setMindfulness}

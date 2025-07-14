@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -6,6 +6,25 @@ export default function Phase2_Step2_GoalScreen({ navigation, route }) {
     const { entryId, experienceData } = route.params;
     const [fulfilled, setFulfilled] = useState(null); // 'Yes', 'Partly', 'No'
     const [notes, setNotes] = useState('');
+    const [originalMotivations, setOriginalMotivations] = useState([]);
+
+    useEffect(() => {
+        const loadOriginalReason = async () => {
+            try {
+                const storedEntries = await AsyncStorage.getItem('pending_entries');
+                if (storedEntries) {
+                    const entries = JSON.parse(storedEntries);
+                    const entry = entries.find(e => e.id === entryId);
+                    if (entry && entry.motivations) {
+                        setOriginalMotivations(entry.motivations);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load original motivations.', e);
+            }
+        };
+        loadOriginalReason();
+    }, [entryId]);
 
     const handleFinish = async () => {
         if (fulfilled === null) {
@@ -47,6 +66,15 @@ export default function Phase2_Step2_GoalScreen({ navigation, route }) {
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Did it fulfill your original reason?</Text>
+
+            {originalMotivations.length > 0 && (
+                <View style={styles.reasonContainer}>
+                    <Text style={styles.reasonTitle}>Your original reason was:</Text>
+                    {originalMotivations.map((reason, index) => (
+                        <Text key={index} style={styles.reasonText}>• {reason}</Text>
+                    ))}
+                </View>
+            )}
 
             <View style={styles.optionsContainer}>
                 {['Yes', 'Partly', 'No'].map(option => (
@@ -91,6 +119,27 @@ const styles = StyleSheet.create({
         color: '#4A5C4D',
         textAlign: 'center',
         marginBottom: 40,
+    },
+    reasonContainer: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 20,
+        marginBottom: 30,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+    },
+    reasonTitle: {
+        fontSize: 18,
+        fontFamily: 'serif',
+        fontWeight: '600',
+        color: '#4A5C4D',
+        marginBottom: 10,
+    },
+    reasonText: {
+        fontSize: 16,
+        fontFamily: 'serif',
+        color: '#4A5C4D',
+        marginBottom: 5,
     },
     optionsContainer: {
         flexDirection: 'row',

@@ -2,9 +2,19 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { useCheckIn } from '../../context/CheckInContext';
 
-const motivationOptions = [
-    'Hunger', 'Stress', 'Celebration', 'Boredom', 'Craving', 
-    'Social', 'Habit', 'Sadness', 'Tiredness', 'Routine', 'Energy', 'Performance'
+const motivationSections = [
+    {
+        title: 'Physical Reason',
+        reasons: ['Hunger', 'Energy', 'Health', 'Performance']
+    },
+    {
+        title: 'Emotional Reason',
+        reasons: ['Comfort', 'Reward', 'Nostalgia', 'Distraction']
+    },
+    {
+        title: 'Environmental Reason',
+        reasons: ['Social connection', 'Habit/routine', 'Marketing/cues', 'Convenience/availability']
+    }
 ];
 
 export default function Step4_MotivationsScreen({ navigation }) {
@@ -22,38 +32,47 @@ export default function Step4_MotivationsScreen({ navigation }) {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>Why are you eating?</Text>
+        <View style={styles.container}>
+            <ScrollView style={styles.scrollContainer}>
+                <Text style={styles.title}>Why are you eating?</Text>
 
-            <View style={styles.motivationsContainer}>
-                {motivationOptions.map(option => (
-                    <TouchableOpacity
-                        key={option}
-                        style={[styles.motivationTag, checkInData.motivations.includes(option) && styles.motivationTagSelected]}
-                        onPress={() => handleMotivationToggle(option)}
-                    >
-                        <Text style={[styles.motivationTagText, checkInData.motivations.includes(option) && styles.motivationTagTextSelected]}>{option}</Text>
-                    </TouchableOpacity>
+                {motivationSections.map(section => (
+                    <View key={section.title} style={styles.sectionContainer}>
+                        <Text style={styles.sectionTitle}>{section.title}</Text>
+                        <View style={styles.motivationsContainer}>
+                            {section.reasons.map(option => (
+                                <TouchableOpacity
+                                    key={option}
+                                    style={[styles.motivationTag, checkInData.motivations.includes(option) && styles.motivationTagSelected]}
+                                    onPress={() => handleMotivationToggle(option)}
+                                >
+                                    <Text style={[styles.motivationTagText, checkInData.motivations.includes(option) && styles.motivationTagTextSelected]}>{option}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
                 ))}
-            </View>
 
-            <Text style={styles.notesLabel}>Any other context? (Optional)</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="e.g., feeling tired after a long day..."
-                placeholderTextColor="#AAB8C2"
-                value={checkInData.notes}
-                onChangeText={(text) => updateCheckInData({ notes: text })}
-                multiline
-            />
+                <Text style={styles.notesLabel}>Any other context? (Optional)</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="e.g., feeling tired after a long day..."
+                    placeholderTextColor="#AAB8C2"
+                    value={checkInData.notes}
+                    onChangeText={(text) => updateCheckInData({ notes: text })}
+                    multiline
+                />
+            </ScrollView>
             
-            <TouchableOpacity 
-                style={styles.nextButton}
-                onPress={handleNext}
-            >
-                <Text style={styles.nextButtonText}>Next</Text>
-            </TouchableOpacity>
-        </ScrollView>
+            <View style={styles.footer}>
+                <TouchableOpacity 
+                    style={styles.nextButton}
+                    onPress={handleNext}
+                >
+                    <Text style={styles.nextButtonText}>Next</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }
 
@@ -61,7 +80,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5F5E9',
-        padding: 20,
+    },
+    scrollContainer: {
+        flex: 1,
+        paddingHorizontal: 20,
         paddingTop: 100,
     },
     title: {
@@ -72,11 +94,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 30,
     },
+    sectionContainer: {
+        marginBottom: 25,
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontFamily: 'serif',
+        fontWeight: '600',
+        color: '#4A5C4D',
+        marginBottom: 15,
+    },
     motivationsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'center',
-        marginBottom: 40,
+        justifyContent: 'flex-start',
     },
     motivationTag: {
         backgroundColor: '#FFFFFF',
@@ -85,7 +116,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#E0E0E0',
-        margin: 6,
+        marginRight: 10,
+        marginBottom: 10,
     },
     motivationTagSelected: {
         backgroundColor: '#4A5C4D',
@@ -115,7 +147,10 @@ const styles = StyleSheet.create({
         borderColor: '#E0E0E0',
         minHeight: 120,
         textAlignVertical: 'top',
-        marginBottom: 30,
+    },
+    footer: {
+        padding: 20,
+        backgroundColor: '#F5F5E9',
     },
     nextButton: {
         backgroundColor: '#4A5C4D',
