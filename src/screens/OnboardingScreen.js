@@ -19,14 +19,14 @@ import {
     ArrowLeftIcon,
     ArrowRightIcon,
 } from 'react-native-heroicons/outline';
+import { COLORS, FONTS, SPACING, BORDERS } from '../constants/theme';
 
-const iconColor = '#4A5C4D';
 const iconSize = 24;
 
 const OnboardingPage1 = () => (
     <ScrollView contentContainerStyle={styles.page}>
         <View style={styles.titleContainer}>
-            <AcademicCapIcon size={32} color={iconColor} style={styles.titleIcon} />
+            <AcademicCapIcon size={32} color={COLORS.primary} style={styles.titleIcon} />
             <Text style={styles.pageTitle}>What is Mindful Eating?</Text>
         </View>
         <Text style={styles.pageText}>
@@ -34,27 +34,27 @@ const OnboardingPage1 = () => (
         </Text>
         <View style={styles.list}>
             <View style={styles.listItemContainer}>
-                <EyeIcon size={iconSize} color={iconColor} style={styles.listIcon} />
+                <EyeIcon size={iconSize} color={COLORS.primary} style={styles.listIcon} />
                 <Text style={styles.listItem}>Awareness of emotions and triggers</Text>
             </View>
             <View style={styles.listItemContainer}>
-                <ScaleIcon size={iconSize} color={iconColor} style={styles.listIcon} />
+                <ScaleIcon size={iconSize} color={COLORS.primary} style={styles.listIcon} />
                 <Text style={styles.listItem}>Tuning into hunger and fullness</Text>
             </View>
             <View style={styles.listItemContainer}>
-                <ClockIcon size={iconSize} color={iconColor} style={styles.listIcon} />
+                <ClockIcon size={iconSize} color={COLORS.primary} style={styles.listIcon} />
                 <Text style={styles.listItem}>Slowing down</Text>
             </View>
             <View style={styles.listItemContainer}>
-                <NoSymbolIcon size={iconSize} color={iconColor} style={styles.listIcon} />
+                <NoSymbolIcon size={iconSize} color={COLORS.primary} style={styles.listIcon} />
                 <Text style={styles.listItem}>Reducing distractions</Text>
             </View>
             <View style={styles.listItemContainer}>
-                <SparklesIcon size={iconSize} color={iconColor} style={styles.listIcon} />
+                <SparklesIcon size={iconSize} color={COLORS.primary} style={styles.listIcon} />
                 <Text style={styles.listItem}>Engaging your senses</Text>
             </View>
             <View style={styles.listItemContainer}>
-                <HeartIcon size={iconSize} color={iconColor} style={styles.listIcon} />
+                <HeartIcon size={iconSize} color={COLORS.primary} style={styles.listIcon} />
                 <Text style={styles.listItem}>Non-judgmental observation</Text>
             </View>
         </View>
@@ -64,25 +64,25 @@ const OnboardingPage1 = () => (
 const OnboardingPage2 = () => (
     <ScrollView contentContainerStyle={styles.page}>
         <View style={styles.titleContainer}>
-            <DevicePhoneMobileIcon size={32} color={iconColor} style={styles.titleIcon} />
+            <DevicePhoneMobileIcon size={32} color={COLORS.primary} style={styles.titleIcon} />
             <Text style={styles.pageTitle}>How the App Works</Text>
         </View>
         <View style={styles.sectionContainer}>
-            <ArrowRightCircleIcon size={iconSize} color={iconColor} style={styles.sectionIcon} />
+            <ArrowRightCircleIcon size={iconSize} color={COLORS.primary} style={styles.sectionIcon} />
             <Text style={styles.sectionTitle}>Before Eating</Text>
         </View>
         <Text style={styles.pageText}>
             You'll reflect on what you're about to eat, how you're feeling, and why you're eating.
         </Text>
         <View style={styles.sectionContainer}>
-            <ArrowLeftCircleIcon size={iconSize} color={iconColor} style={styles.sectionIcon} />
+            <ArrowLeftCircleIcon size={iconSize} color={COLORS.primary} style={styles.sectionIcon} />
             <Text style={styles.sectionTitle}>After Eating</Text>
         </View>
         <Text style={styles.pageText}>
             You'll reflect on how the meal felt, your fullness, and any mood shifts.
         </Text>
         <View style={styles.sectionContainer}>
-            <ChartBarIcon size={iconSize} color={iconColor} style={styles.sectionIcon} />
+            <ChartBarIcon size={iconSize} color={COLORS.primary} style={styles.sectionIcon} />
             <Text style={styles.sectionTitle}>Spot the Patterns</Text>
         </View>
         <Text style={styles.pageText}>
@@ -94,7 +94,7 @@ const OnboardingPage2 = () => (
 const OnboardingPage3 = ({ onComplete }) => (
     <ScrollView contentContainerStyle={styles.page}>
         <View style={styles.titleContainer}>
-            <RocketLaunchIcon size={32} color={iconColor} style={styles.titleIcon} />
+            <RocketLaunchIcon size={32} color={COLORS.primary} style={styles.titleIcon} />
             <Text style={styles.pageTitle}>Set Your Intention</Text>
         </View>
         <Text style={styles.pageText}>
@@ -103,7 +103,7 @@ const OnboardingPage3 = ({ onComplete }) => (
         <Text style={styles.pageText}>
             Choose a focus that feels realistic and personal.
         </Text>
-        <TouchableOpacity style={[styles.navButton, { marginTop: 40 }]} onPress={onComplete}>
+        <TouchableOpacity style={[styles.navButton, { marginTop: SPACING.xl }]} onPress={onComplete}>
             <Text style={styles.buttonText}>Set My Intentions</Text>
         </TouchableOpacity>
     </ScrollView>
@@ -178,7 +178,7 @@ export default function OnboardingScreen({ navigation }) {
             <View style={styles.navigationContainer}>
                 {currentPage > 0 ? (
                     <TouchableOpacity style={styles.arrowButton} onPress={handleBack}>
-                        <ArrowLeftIcon size={30} color={iconColor} />
+                        <ArrowLeftIcon size={30} color={COLORS.primary} />
                     </TouchableOpacity>
                 ) : <View style={styles.navButtonPlaceholder} /> }
 
@@ -188,7 +188,7 @@ export default function OnboardingScreen({ navigation }) {
 
                 {currentPage < 2 ? (
                     <TouchableOpacity style={styles.arrowButton} onPress={handleNext}>
-                        <ArrowRightIcon size={30} color={iconColor} />
+                        <ArrowRightIcon size={30} color={COLORS.primary} />
                     </TouchableOpacity>
                 ) : <View style={styles.navButtonPlaceholder} />}
             </View>
@@ -199,108 +199,91 @@ export default function OnboardingScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F5E9',
+        backgroundColor: COLORS.background,
     },
     pagerView: {
         flex: 1,
     },
     page: {
-        padding: 20,
-        paddingTop: 90,
+        padding: SPACING.md,
+        paddingTop: SPACING.xxl,
         alignItems: 'center',
     },
     titleContainer: {
         flexDirection: 'column',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: SPACING.md,
     },
     titleIcon: {
-        marginBottom: 15,
+        marginBottom: SPACING.sm,
     },
     pageTitle: {
-        fontSize: 28,
-        fontFamily: 'serif',
-        fontWeight: '600',
-        color: '#4A5C4D',
+        ...FONTS.h2,
         textAlign: 'center',
     },
     sectionContainer: {
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 10,
+        marginTop: SPACING.md,
+        marginBottom: SPACING.sm,
     },
     sectionIcon: {
-        marginBottom: 10,
+        marginBottom: SPACING.sm,
     },
     sectionTitle: {
-        fontSize: 22,
-        fontFamily: 'serif',
-        fontWeight: '600',
-        color: '#4A5C4D',
+        ...FONTS.h3,
         textAlign: 'center',
     },
     pageText: {
-        fontSize: 16,
-        color: '#4A5C4D',
+        ...FONTS.body,
         textAlign: 'center',
-        marginBottom: 15,
-        lineHeight: 24,
+        marginBottom: SPACING.sm,
     },
     list: {
         alignItems: 'flex-start',
-        marginVertical: 10,
+        marginVertical: SPACING.sm,
         width: '100%',
     },
     listItemContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: SPACING.sm,
     },
     listIcon: {
-        marginRight: 15,
+        marginRight: SPACING.sm,
     },
     listItem: {
-        fontSize: 16,
-        color: '#4A5C4D',
-        lineHeight: 24,
+        ...FONTS.body,
         flexShrink: 1,
     },
     navigationContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 20,
-        paddingHorizontal: 40,
-        backgroundColor: '#F5F5E9',
+        paddingVertical: SPACING.md,
+        paddingHorizontal: SPACING.xl,
+        backgroundColor: COLORS.background,
     },
     navButton: {
-        backgroundColor: '#4A5C4D',
-        paddingVertical: 15,
-        paddingHorizontal: 40,
-        borderRadius: 12,
+        backgroundColor: COLORS.primary,
+        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.xl,
+        borderRadius: BORDERS.radius,
         alignItems: 'center',
         minWidth: 120,
     },
     arrowButton: {
-        padding: 10,
+        padding: SPACING.sm,
     },
     navButtonPlaceholder: {
         width: 50, // width of arrowButton
-        padding: 10,
+        padding: SPACING.sm,
     },
     buttonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    skipContainer: {
-        alignItems: 'center',
-        paddingVertical: 10,
-        backgroundColor: '#F5F5E9',
+        ...FONTS.button,
     },
     skipButtonText: {
-        color: '#FF6B6B',
+        color: COLORS.accent,
         fontSize: 16,
         fontFamily: 'serif',
         fontWeight: 'bold',

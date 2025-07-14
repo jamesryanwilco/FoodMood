@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import StickyFooterLayout from '../components/StickyFooterLayout';
+import { COLORS, FONTS, SPACING, BORDERS } from '../constants/theme';
 
 const GOALS_STORAGE_KEY = 'user_goals';
 
@@ -85,113 +87,93 @@ export default function GoalsScreen() {
         }
     };
 
+    const renderFooter = () => (
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Save My Intentions</Text>
+        </TouchableOpacity>
+    );
+
     return (
-        <View style={styles.container}>
-            <ScrollView style={styles.scrollContainer}>
-                <Text style={styles.title}>What matters most to you right now?</Text>
-                <Text style={styles.subtitle}>Choose what resonates with you. You can always change this later.</Text>
+        <StickyFooterLayout footer={renderFooter()}>
+            <Text style={styles.title}>What matters most to you right now?</Text>
+            <Text style={styles.subtitle}>Choose what resonates with you. You can always change this later.</Text>
 
-                {goalsData.map(section => (
-                    <View key={section.category} style={styles.section}>
-                        <TouchableOpacity onPress={() => toggleSection(section.category)} style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>{section.emoji} {section.category}</Text>
-                            <Text style={styles.sectionToggle}>{expandedSections[section.category] ? '−' : '+'}</Text>
-                        </TouchableOpacity>
-                        {expandedSections[section.category] && section.items.map(item => {
-                            const isSelected = selectedGoals.includes(item);
-                            const medalIndex = selectedGoals.indexOf(item);
-                            const medal = ['🥇', '🥈', '🥉'][medalIndex];
+            {goalsData.map(section => (
+                <View key={section.category} style={styles.section}>
+                    <TouchableOpacity onPress={() => toggleSection(section.category)} style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>{section.emoji} {section.category}</Text>
+                        <Text style={styles.sectionToggle}>{expandedSections[section.category] ? '−' : '+'}</Text>
+                    </TouchableOpacity>
+                    {expandedSections[section.category] && section.items.map(item => {
+                        const isSelected = selectedGoals.includes(item);
+                        const medalIndex = selectedGoals.indexOf(item);
+                        const medal = ['🥇', '🥈', '🥉'][medalIndex];
 
-                            return (
-                                <TouchableOpacity
-                                    key={item}
-                                    style={[styles.goalButton, isSelected && styles.goalButtonSelected]}
-                                    onPress={() => handleSelectGoal(item)}
-                                >
-                                    <View style={styles.goalContent}>
-                                        {isSelected && medal ? <Text style={styles.medal}>{medal}</Text> : null}
-                                        <Text style={[styles.goalText, isSelected && styles.goalTextSelected]}>{item}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
-                ))}
-
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>✍️ Write your own intention (optional)</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="I want to..."
-                        placeholderTextColor="#AAB8C2"
-                        value={customGoal}
-                        onChangeText={setCustomGoal}
-                    />
+                        return (
+                            <TouchableOpacity
+                                key={item}
+                                style={[styles.goalButton, isSelected && styles.goalButtonSelected]}
+                                onPress={() => handleSelectGoal(item)}
+                            >
+                                <View style={styles.goalContent}>
+                                    {isSelected && medal ? <Text style={styles.medal}>{medal}</Text> : null}
+                                    <Text style={[styles.goalText, isSelected && styles.goalTextSelected]}>{item}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    })}
                 </View>
-            </ScrollView>
+            ))}
 
-            <View style={styles.footer}>
-                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                    <Text style={styles.saveButtonText}>Save My Intentions</Text>
-                </TouchableOpacity>
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>✍️ Write your own intention (optional)</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="I want to..."
+                    placeholderTextColor={COLORS.textLight}
+                    value={customGoal}
+                    onChangeText={setCustomGoal}
+                />
             </View>
-        </View>
+        </StickyFooterLayout>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F5F5E9',
-    },
-    scrollContainer: {
-        flex: 1,
-        paddingHorizontal: 20,
-        paddingTop: 100,
-    },
     title: {
-        fontSize: 28,
-        fontFamily: 'serif',
-        fontWeight: '600',
-        color: '#4A5C4D',
+        ...FONTS.h2,
         textAlign: 'center',
     },
     subtitle: {
-        fontSize: 18,
-        fontFamily: 'serif',
-        color: '#4A5C4D',
+        ...FONTS.body,
         textAlign: 'center',
-        marginTop: 10,
-        marginBottom: 30,
+        marginTop: SPACING.sm,
+        marginBottom: SPACING.lg,
     },
     section: {
-        marginBottom: 30,
-    },
-    sectionTitle: {
-        fontSize: 22,
-        fontFamily: 'serif',
-        fontWeight: '600',
-        color: '#4A5C4D',
-        marginBottom: 15,
+        marginBottom: SPACING.lg,
     },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: SPACING.sm,
+    },
+    sectionTitle: {
+        ...FONTS.h3,
     },
     sectionToggle: {
         fontSize: 28,
-        color: '#4A5C4D',
+        color: COLORS.primary,
         fontWeight: '300',
     },
     goalButton: {
-        backgroundColor: '#FFFFFF',
-        padding: 20,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-        marginBottom: 10,
+        backgroundColor: COLORS.white,
+        padding: SPACING.md,
+        borderRadius: BORDERS.radius,
+        borderWidth: BORDERS.width,
+        borderColor: COLORS.lightGray,
+        marginBottom: SPACING.sm,
     },
     goalContent: {
         flexDirection: 'row',
@@ -199,55 +181,35 @@ const styles = StyleSheet.create({
     },
     medal: {
         fontSize: 20,
-        marginRight: 10,
+        marginRight: SPACING.sm,
     },
     goalButtonSelected: {
-        backgroundColor: '#4A5C4D',
-        borderColor: '#4A5C4D',
+        backgroundColor: COLORS.primary,
+        borderColor: COLORS.primary,
     },
     goalText: {
-        fontSize: 16,
-        fontFamily: 'serif',
-        color: '#4A5C4D',
+        ...FONTS.body,
+        flexShrink: 1,
     },
     goalTextSelected: {
-        color: '#FFFFFF',
+        color: COLORS.white,
     },
     input: {
-        backgroundColor: '#FFFFFF',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-        borderRadius: 12,
-        fontSize: 16,
-        color: '#4A5C4D',
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
+        ...FONTS.body,
+        backgroundColor: COLORS.white,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        borderRadius: BORDERS.radius,
+        borderWidth: BORDERS.width,
+        borderColor: COLORS.lightGray,
     },
     saveButton: {
-        backgroundColor: '#FF6B6B',
-        paddingVertical: 18,
-        borderRadius: 12,
+        backgroundColor: COLORS.accent,
+        paddingVertical: SPACING.md,
+        borderRadius: BORDERS.radius,
         alignItems: 'center',
     },
     saveButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    footerText: {
-        fontSize: 14,
-        fontFamily: 'serif',
-        color: '#AAB8C2',
-        textAlign: 'center',
-        marginBottom: 40,
-        fontStyle: 'italic',
-    },
-    footer: {
-        paddingTop: 20,
-        paddingHorizontal: 20,
-        paddingBottom: 60,
-        borderTopWidth: 1,
-        borderTopColor: '#E0E0E0',
-        backgroundColor: '#F5F5E9',
+        ...FONTS.button,
     },
 }); 

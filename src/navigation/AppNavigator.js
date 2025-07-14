@@ -13,8 +13,20 @@ import Phase2_Step1a_EmotionScreen from '../screens/checkin/Phase2_Step1a_Emotio
 import Phase2_Step2_GoalScreen from '../screens/checkin/Phase2_Step2_GoalScreen';
 import SelectGoalsScreen from '../screens/SelectGoalsScreen';
 import ViewGoalsScreen from '../screens/ViewGoalsScreen';
+import { COLORS } from '../constants/theme';
 
 const Stack = createStackNavigator();
+
+const commonHeaderOptions = {
+    headerShown: true,
+    headerStyle: {
+        backgroundColor: COLORS.background,
+    },
+    headerShadowVisible: false,
+    headerTitle: '',
+    headerBackTitleVisible: false,
+    headerTintColor: COLORS.primary,
+};
 
 export default function AppNavigator() {
   return (
@@ -22,7 +34,7 @@ export default function AppNavigator() {
       initialRouteName="Welcome" 
       screenOptions={{ 
         headerShown: false,
-        cardStyle: { backgroundColor: '#F5F5E9' },
+        cardStyle: { backgroundColor: COLORS.background },
       }}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
@@ -31,111 +43,55 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="CheckInStep1" 
         component={Step1_BasicInfoScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="CheckInStep2" 
         component={Step2_EmotionScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="CheckInStep3" 
         component={Step3_PhysicalStateScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="CheckInStep4" 
         component={Step4_MotivationsScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="Step5_Reminder" 
         component={Step5_ReminderScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="CompleteStep1" 
         component={Phase2_Step1_ExperienceScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="CompleteStep1a" 
         component={Phase2_Step1a_EmotionScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="CompleteStep2" 
         component={Phase2_Step2_GoalScreen} 
-        options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
       <Stack.Screen 
         name="SelectGoals" 
         component={SelectGoalsScreen} 
         options={{ 
-          headerShown: true, 
-          headerTransparent: true, 
-          headerTitle: '', 
+          ...commonHeaderOptions,
           headerBackVisible: false, 
         }} 
       />
       <Stack.Screen 
         name="ViewGoals" 
         component={ViewGoalsScreen} 
-        options={{ 
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: '',
-          headerBackTitleVisible: false,
-          headerTintColor: '#4A5C4D',
-        }} 
+        options={commonHeaderOptions}
       />
     </Stack.Navigator>
   );

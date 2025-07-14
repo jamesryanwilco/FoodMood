@@ -12,6 +12,28 @@ import { LineChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get("window").width;
 
+const InsightsHeader = ({ title, dateRange, streakCount, filterIndex, onFilterChange }) => (
+    <View style={styles.headerContainer}>
+        <View style={styles.header}>
+            <View>
+                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.dateRange}>{dateRange}</Text>
+            </View>
+            <View style={styles.streakContainer}>
+                <FireIcon color="#FF6B6B" size={28} />
+                <Text style={styles.streakText}>{streakCount}</Text>
+            </View>
+        </View>
+        <View style={styles.filterContainer}>
+            <StyledSegmentedControl
+                values={['This Week', 'This Month', 'All Time']}
+                selectedIndex={filterIndex}
+                onChange={(event) => onFilterChange(event.nativeEvent.selectedSegmentIndex)}
+            />
+        </View>
+    </View>
+);
+
 const MealIcon = ({ mealType, size = 22, color = "#4A5C4D" }) => {
     switch(mealType) {
         case 'Breakfast': return <SunIcon size={size} color={color} />;
@@ -353,192 +375,178 @@ export default function InsightsScreen() {
 
   return (
     <View style={{flex: 1, backgroundColor: '#F5F5E9'}}>
-        <ScrollView style={styles.container}>
-        <View style={styles.header}>
-            <View>
-                <Text style={styles.title}>Insights</Text>
-                <Text style={styles.dateRange}>{dateRangeText}</Text>
+        <InsightsHeader
+            title="Insights"
+            dateRange={dateRangeText}
+            streakCount={streakCount}
+            filterIndex={filterIndex}
+            onFilterChange={setFilterIndex}
+        />
+        <ScrollView style={styles.scrollContainer}>
+            <View style={styles.statsRow}>
+                <View style={[styles.statCard, styles.statCardHalf]}>
+                    <Text style={styles.statValue}>{totalEntries}</Text>
+                    <Text style={styles.statLabel}>Total entries</Text>
+                </View>
+                <View style={[styles.statCard, styles.statCardHalf]}>
+                    <Text style={styles.statValue}>
+                        {avgEnergyBoost > 0 ? '+' : ''}{avgEnergyBoost.toFixed(1)}
+                    </Text>
+                    <Text style={styles.statLabel}>Avg. Energy Boost</Text>
+                </View>
             </View>
-            <View style={styles.streakContainer}>
-                <FireIcon color="#FF6B6B" size={28} />
-                <Text style={styles.streakText}>{streakCount}</Text>
-            </View>
-        </View>
 
-        <View style={styles.filterContainer}>
-            <StyledSegmentedControl
-                values={['This Week', 'This Month', 'All Time']}
-                selectedIndex={filterIndex}
-                onChange={(event) => {
-                    setFilterIndex(event.nativeEvent.selectedSegmentIndex);
-                }}
-            />
-        </View>
+            {motivationData.length > 0 && (
+                <View style={styles.chartContainer}>
+                    <Text style={styles.sectionTitle}>Eating Motivations</Text>
+                    <PieChart
+                        data={motivationData}
+                        width={screenWidth - 20} // from padding
+                        height={220}
+                        chartConfig={{
+                            backgroundGradientFrom: '#F5F5E9',
+                            backgroundGradientTo: '#F5F5E9',
+                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                        }}
+                        accessor={"population"}
+                        backgroundColor={"transparent"}
+                        paddingLeft={"15"}
+                        center={[10, 0]}
+                        absolute
+                    />
+                </View>
+            )}
 
-        <View style={styles.statsRow}>
-            <View style={[styles.statCard, styles.statCardHalf]}>
-                <Text style={styles.statValue}>{totalEntries}</Text>
-                <Text style={styles.statLabel}>Total entries</Text>
-            </View>
-            <View style={[styles.statCard, styles.statCardHalf]}>
-                <Text style={styles.statValue}>
-                    {avgEnergyBoost > 0 ? '+' : ''}{avgEnergyBoost.toFixed(1)}
-                </Text>
-                <Text style={styles.statLabel}>Avg. Energy Boost</Text>
-            </View>
-        </View>
-
-        {motivationData.length > 0 && (
-            <View style={styles.chartContainer}>
-                <Text style={styles.sectionTitle}>Eating Motivations</Text>
-                <PieChart
-                    data={motivationData}
-                    width={screenWidth - 20} // from padding
-                    height={220}
-                    chartConfig={{
-                        backgroundGradientFrom: '#F5F5E9',
-                        backgroundGradientTo: '#F5F5E9',
-                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                    }}
-                    accessor={"population"}
-                    backgroundColor={"transparent"}
-                    paddingLeft={"15"}
-                    center={[10, 0]}
-                    absolute
-                />
-            </View>
-        )}
-
-        {topMeals.length > 0 && (
-            <View style={styles.topListContainer}>
-                <Text style={styles.sectionTitle}>Top Energy Boosts</Text>
-                {topMeals.map((meal, index) => (
-                    <View key={meal.id} style={styles.listItem}>
-                        <Text style={styles.medal}>{medalEmojis[index]}</Text>
-                        <View style={styles.listItemText}>
-                            <Text style={styles.mealDescription}>{meal.foodDescription}</Text>
-                        </View>
-                        <Text style={styles.energyBoostValue}>+{meal.energyBoost.toFixed(1)}</Text>
-                    </View>
-                ))}
-            </View>
-        )}
-
-        {topMoodShifts.length > 0 && (
-            <View style={styles.topListContainer}>
-                <Text style={styles.sectionTitle}>Common Mood Shifts</Text>
-                {topMoodShifts.map((item, index) => (
-                    <TouchableOpacity key={index} onPress={() => handleShiftPress(item)}>
-                        <View style={styles.listItem}>
+            {topMeals.length > 0 && (
+                <View style={styles.topListContainer}>
+                    <Text style={styles.sectionTitle}>Top Energy Boosts</Text>
+                    {topMeals.map((meal, index) => (
+                        <View key={meal.id} style={styles.listItem}>
+                            <Text style={styles.medal}>{medalEmojis[index]}</Text>
                             <View style={styles.listItemText}>
-                                <Text style={styles.mealDescription}>{item.shift}</Text>
+                                <Text style={styles.mealDescription}>{meal.foodDescription}</Text>
                             </View>
-                            <Text style={styles.shiftCount}>{item.count}x</Text>
+                            <Text style={styles.energyBoostValue}>+{meal.energyBoost.toFixed(1)}</Text>
                         </View>
-                    </TouchableOpacity>
-                ))}
-            </View>
-        )}
+                    ))}
+                </View>
+            )}
 
-        {plotData && totalEntries >= 2 && (
-            <View style={styles.chartContainer}>
-                <Text style={styles.sectionTitle}>Energy</Text>
-                <LineChart
-                    data={plotData}
-                    width={screenWidth - 10}
-                    height={220}
-                    chartConfig={{
-                        backgroundGradientFrom: '#F5F5E9',
-                        backgroundGradientTo: '#F5F5E9',
-                        fillShadowGradient: 'rgba(107, 122, 255, 1)', // Blue
-                        fillShadowGradientOpacity: 0.2,
-                        decimalPlaces: 1,
-                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Base color, will be overridden by dataset colors
-                        labelColor: (opacity = 1) => `rgba(74, 92, 77, ${opacity})`,
-                        style: { borderRadius: 16 },
-                        propsForDots: {
-                            r: filterIndex === 2 ? "0" : "4", // Hide dots for 'All Time'
-                        }
-                    }}
-                    bezier
-                    style={styles.lineChart}
-                    onDataPointClick={handleDataPointClick}
-                    getDotColor={(dataPoint, dataPointIndex) => {
-                        if (dataPointIndex === selectedPointIndex) {
-                            return '#FF6B6B'; // Highlight color
-                        }
-                        return 'rgba(74, 92, 77, 0.2)'; // Default dot color for unselected points
-                    }}
-                    withInnerLines={false}
-                    withOuterLines={false}
-                    withShadow={true}
-                />
-            </View>
-        )}
+            {topMoodShifts.length > 0 && (
+                <View style={styles.topListContainer}>
+                    <Text style={styles.sectionTitle}>Common Mood Shifts</Text>
+                    {topMoodShifts.map((item, index) => (
+                        <TouchableOpacity key={index} onPress={() => handleShiftPress(item)}>
+                            <View style={styles.listItem}>
+                                <View style={styles.listItemText}>
+                                    <Text style={styles.mealDescription}>{item.shift}</Text>
+                                </View>
+                                <Text style={styles.shiftCount}>{item.count}x</Text>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            )}
 
-        {hungerPlotData && totalEntries >= 2 && (
-            <View style={styles.chartContainer}>
-                <Text style={styles.sectionTitle}>Hunger & Fullness</Text>
-                <LineChart
-                    data={hungerPlotData}
-                    width={screenWidth - 10}
-                    height={220}
-                    chartConfig={{
-                        backgroundGradientFrom: '#F5F5E9',
-                        backgroundGradientTo: '#F5F5E9',
-                        fillShadowGradient: 'rgba(255, 152, 0, 1)', // Orange
-                        fillShadowGradientOpacity: 0.2,
-                        decimalPlaces: 1,
-                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(74, 92, 77, ${opacity})`,
-                        style: { borderRadius: 16 },
-                        propsForDots: {
-                            r: filterIndex === 2 ? "0" : "4",
-                        }
-                    }}
-                    bezier
-                    style={styles.lineChart}
-                    onDataPointClick={handleHungerDataPointClick}
-                    withInnerLines={false}
-                    withOuterLines={false}
-                    withShadow={true}
-                />
-            </View>
-        )}
+            {plotData && totalEntries >= 2 && (
+                <View style={styles.chartContainer}>
+                    <Text style={styles.sectionTitle}>Energy</Text>
+                    <LineChart
+                        data={plotData}
+                        width={screenWidth - 10}
+                        height={220}
+                        chartConfig={{
+                            backgroundGradientFrom: '#F5F5E9',
+                            backgroundGradientTo: '#F5F5E9',
+                            fillShadowGradient: 'rgba(107, 122, 255, 1)', // Blue
+                            fillShadowGradientOpacity: 0.2,
+                            decimalPlaces: 1,
+                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Base color, will be overridden by dataset colors
+                            labelColor: (opacity = 1) => `rgba(74, 92, 77, ${opacity})`,
+                            style: { borderRadius: 16 },
+                            propsForDots: {
+                                r: filterIndex === 2 ? "0" : "4", // Hide dots for 'All Time'
+                            }
+                        }}
+                        bezier
+                        style={styles.lineChart}
+                        onDataPointClick={handleDataPointClick}
+                        getDotColor={(dataPoint, dataPointIndex) => {
+                            if (dataPointIndex === selectedPointIndex) {
+                                return '#FF6B6B'; // Highlight color
+                            }
+                            return 'rgba(74, 92, 77, 0.2)'; // Default dot color for unselected points
+                        }}
+                        withInnerLines={false}
+                        withOuterLines={false}
+                        withShadow={true}
+                    />
+                </View>
+            )}
 
-        {howWeEatPlotData && totalEntries >= 2 && (
-            <View style={styles.chartContainer}>
-                <Text style={styles.sectionTitle}>How You Eat</Text>
-                <LineChart
-                    data={howWeEatPlotData}
-                    width={screenWidth - 10}
-                    height={220}
-                    chartConfig={{
-                        backgroundGradientFrom: '#F5F5E9',
-                        backgroundGradientTo: '#F5F5E9',
-                        fillShadowGradient: 'rgba(142, 68, 173, 1)', // Purple
-                        fillShadowGradientOpacity: 0.2,
-                        decimalPlaces: 1,
-                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(74, 92, 77, ${opacity})`,
-                        style: { borderRadius: 16 },
-                        propsForDots: {
-                            r: filterIndex === 2 ? "0" : "4",
-                        }
-                    }}
-                    bezier
-                    style={styles.lineChart}
-                    onDataPointClick={handleHowWeEatDataPointClick}
-                    withInnerLines={false}
-                    withOuterLines={false}
-                    withShadow={true}
-                />
-            </View>
-        )}
+            {hungerPlotData && totalEntries >= 2 && (
+                <View style={styles.chartContainer}>
+                    <Text style={styles.sectionTitle}>Hunger & Fullness</Text>
+                    <LineChart
+                        data={hungerPlotData}
+                        width={screenWidth - 10}
+                        height={220}
+                        chartConfig={{
+                            backgroundGradientFrom: '#F5F5E9',
+                            backgroundGradientTo: '#F5F5E9',
+                            fillShadowGradient: 'rgba(255, 152, 0, 1)', // Orange
+                            fillShadowGradientOpacity: 0.2,
+                            decimalPlaces: 1,
+                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                            labelColor: (opacity = 1) => `rgba(74, 92, 77, ${opacity})`,
+                            style: { borderRadius: 16 },
+                            propsForDots: {
+                                r: filterIndex === 2 ? "0" : "4",
+                            }
+                        }}
+                        bezier
+                        style={styles.lineChart}
+                        onDataPointClick={handleHungerDataPointClick}
+                        withInnerLines={false}
+                        withOuterLines={false}
+                        withShadow={true}
+                    />
+                </View>
+            )}
 
-        <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>The more you check in, the smarter your insights will become.</Text>
-        </View>
+            {howWeEatPlotData && totalEntries >= 2 && (
+                <View style={styles.chartContainer}>
+                    <Text style={styles.sectionTitle}>How You Eat</Text>
+                    <LineChart
+                        data={howWeEatPlotData}
+                        width={screenWidth - 10}
+                        height={220}
+                        chartConfig={{
+                            backgroundGradientFrom: '#F5F5E9',
+                            backgroundGradientTo: '#F5F5E9',
+                            fillShadowGradient: 'rgba(142, 68, 173, 1)', // Purple
+                            fillShadowGradientOpacity: 0.2,
+                            decimalPlaces: 1,
+                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                            labelColor: (opacity = 1) => `rgba(74, 92, 77, ${opacity})`,
+                            style: { borderRadius: 16 },
+                            propsForDots: {
+                                r: filterIndex === 2 ? "0" : "4",
+                            }
+                        }}
+                        bezier
+                        style={styles.lineChart}
+                        onDataPointClick={handleHowWeEatDataPointClick}
+                        withInnerLines={false}
+                        withOuterLines={false}
+                        withShadow={true}
+                    />
+                </View>
+            )}
+
+            <View style={styles.infoContainer}>
+                <Text style={styles.infoText}>The more you check in, the smarter your insights will become.</Text>
+            </View>
         </ScrollView>
         <Modal
             animationType="slide"
@@ -693,16 +701,22 @@ export default function InsightsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     flex: 1,
+    paddingHorizontal: 20,
+  },
+  headerContainer: {
     backgroundColor: '#F5F5E9',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 80,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 60,
     marginBottom: 20,
   },
   title: {
@@ -735,13 +749,13 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   filterContainer: {
-    marginBottom: 20,
-    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 30,
+    marginTop: 20,
   },
   statCard: {
     backgroundColor: '#FFFFFF',

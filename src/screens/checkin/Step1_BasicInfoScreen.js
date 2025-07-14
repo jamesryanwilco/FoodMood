@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert, FlatList, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert, FlatList, Keyboard, ScrollView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SunIcon, MoonIcon, SwatchIcon, BellAlertIcon } from 'react-native-heroicons/outline';
 import { useCheckIn } from '../../context/CheckInContext';
@@ -86,64 +86,66 @@ export default function Step1_BasicInfoScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>What are you about to eat?</Text>
+            <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="always">
+                <Text style={styles.title}>What are you about to eat?</Text>
 
-            {Platform.OS === 'android' && (
-                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
-                    <Text style={styles.dateButtonText}>{checkInData.date.toLocaleString()}</Text>
-                </TouchableOpacity>
-            )}
-            {showDatePicker && (
-                <DateTimePicker
-                    value={checkInData.date}
-                    mode="datetime"
-                    display="default"
-                    onChange={onDateChange}
-                    style={styles.datePicker}
-                />
-            )}
-
-            <View style={styles.mealTypeContainer}>
-                {mealTypes.map(meal => (
-                    <MealTypeButton
-                        key={meal.label}
-                        icon={meal.icon}
-                        label={meal.label}
-                        selected={checkInData.mealType === meal.label}
-                        onPress={() => updateCheckInData({ mealType: meal.label })}
+                {Platform.OS === 'android' && (
+                    <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
+                        <Text style={styles.dateButtonText}>{checkInData.date.toLocaleString()}</Text>
+                    </TouchableOpacity>
+                )}
+                {showDatePicker && (
+                    <DateTimePicker
+                        value={checkInData.date}
+                        mode="datetime"
+                        display="default"
+                        onChange={onDateChange}
+                        style={styles.datePicker}
                     />
-                ))}
-            </View>
+                )}
 
-            <TextInput
-                style={styles.input}
-                placeholder="Describe your meal..."
-                placeholderTextColor="#AAB8C2"
-                value={checkInData.foodDescription}
-                onChangeText={handleDescriptionChange}
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => setIsInputFocused(false)}
-            />
-            {isInputFocused && suggestions.length > 0 && (
-                <FlatList
-                    style={styles.suggestionsContainer}
-                    data={suggestions}
-                    keyExtractor={(item) => item}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity 
-                            style={styles.suggestionItem} 
-                            onPress={() => onSuggestionPress(item)}
-                        >
-                            <Text style={styles.suggestionText}>{item}</Text>
-                        </TouchableOpacity>
-                    )}
-                    keyboardShouldPersistTaps="always"
+                <View style={styles.mealTypeContainer}>
+                    {mealTypes.map(meal => (
+                        <MealTypeButton
+                            key={meal.label}
+                            icon={meal.icon}
+                            label={meal.label}
+                            selected={checkInData.mealType === meal.label}
+                            onPress={() => updateCheckInData({ mealType: meal.label })}
+                        />
+                    ))}
+                </View>
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="Describe your meal..."
+                    placeholderTextColor="#AAB8C2"
+                    value={checkInData.foodDescription}
+                    onChangeText={handleDescriptionChange}
+                    onFocus={() => setIsInputFocused(true)}
+                    onBlur={() => setIsInputFocused(false)}
                 />
-            )}
-            
-            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-                <Text style={styles.nextButtonText}>Next</Text>
-            </TouchableOpacity>
+                {isInputFocused && suggestions.length > 0 && (
+                    <FlatList
+                        style={styles.suggestionsContainer}
+                        data={suggestions}
+                        keyExtractor={(item) => item}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity 
+                                style={styles.suggestionItem} 
+                                onPress={() => onSuggestionPress(item)}
+                            >
+                                <Text style={styles.suggestionText}>{item}</Text>
+                            </TouchableOpacity>
+                        )}
+                        keyboardShouldPersistTaps="always"
+                    />
+                )}
+                
+                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                    <Text style={styles.nextButtonText}>Next</Text>
+                </TouchableOpacity>
+            </ScrollView>
         </View>
     );
 }
@@ -152,8 +154,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5F5E9',
-        padding: 20,
-        paddingTop: 100,
+    },
+    scrollContainer: {
+        flex: 1,
+        paddingHorizontal: 20,
     },
     title: {
         fontSize: 28,
@@ -161,6 +165,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#4A5C4D',
         textAlign: 'center',
+        marginTop: 40,
         marginBottom: 30,
     },
     dateButton: {
