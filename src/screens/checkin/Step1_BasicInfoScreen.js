@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert, FlatList, Keyboard, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform, Alert, Keyboard, ScrollView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SunIcon, MoonIcon, SwatchIcon, BellAlertIcon } from 'react-native-heroicons/outline';
 import { useCheckIn } from '../../context/CheckInContext';
@@ -45,7 +45,7 @@ export default function Step1_BasicInfoScreen({ navigation }) {
         if (searchText.length > 0) {
             return pastMeals.filter(meal => 
                 meal.toLowerCase().includes(searchText)
-            );
+            ).slice(0, 8); // Capped for performance
         } else {
             return pastMeals.slice(0, 5); // Show top 5 most frequent meals by default
         }
@@ -126,20 +126,17 @@ export default function Step1_BasicInfoScreen({ navigation }) {
                     onBlur={() => setIsInputFocused(false)}
                 />
                 {isInputFocused && suggestions.length > 0 && (
-                    <FlatList
-                        style={styles.suggestionsContainer}
-                        data={suggestions}
-                        keyExtractor={(item) => item}
-                        renderItem={({ item }) => (
+                    <View style={styles.suggestionsContainer}>
+                        {suggestions.map(item => (
                             <TouchableOpacity 
+                                key={item}
                                 style={styles.suggestionItem} 
                                 onPress={() => onSuggestionPress(item)}
                             >
                                 <Text style={styles.suggestionText}>{item}</Text>
                             </TouchableOpacity>
-                        )}
-                        keyboardShouldPersistTaps="always"
-                    />
+                        ))}
+                    </View>
                 )}
                 
                 <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
