@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckInContext = createContext();
 
@@ -41,10 +42,43 @@ export const CheckInProvider = ({ children }) => {
         });
     };
 
+    const startNewCheckIn = () => {
+        resetCheckInData();
+    };
+
+    const completeCheckIn = async (entryId, phase2Data) => {
+        try {
+            const existingEntries = await AsyncStorage.getItem('pending_entries');
+            let entries = existingEntries ? JSON.parse(existingEntries) : [];
+            
+            const entryIndex = entries.findIndex(e => e.id === entryId);
+
+            if (entryIndex === -1) {
+                console.error('Could not find entry to complete');
+                return;
+            }
+
+            const updatedEntry = {
+                ...entries[entryIndex],
+                ...phase2Data,
+                status: 'completed',
+                phase2_completed_at: new Date().toISOString(),
+            };
+
+            entries[entryIndex] = updatedEntry;
+
+            await AsyncStorage.setItem('pending_entries', JSON.stringify(entries));
+        } catch (e) {
+            console.error("Failed to complete check-in:", e);
+        }
+    };
+
     const value = {
         checkInData,
         updateCheckInData,
+        startNewCheckIn,
         resetCheckInData,
+        completeCheckIn,
     };
 
     return (

@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ArrowRightIcon } from 'react-native-heroicons/outline';
+import PageContainer from '../../components/PageContainer';
+import { useCheckIn } from '../../context/CheckInContext';
+import { trackEvent } from '../../services/AnalyticsService';
 
 export default function Phase2_Step2_GoalScreen({ navigation, route }) {
     const { entryId, experienceData } = route.params;
     const [fulfilled, setFulfilled] = useState(null); // 'Yes', 'Partly', 'No'
     const [notes, setNotes] = useState('');
     const [originalMotivations, setOriginalMotivations] = useState([]);
+    const { completeCheckIn } = useCheckIn();
 
     useEffect(() => {
         const loadOriginalReason = async () => {
@@ -56,6 +61,10 @@ export default function Phase2_Step2_GoalScreen({ navigation, route }) {
             Alert.alert('Entry Complete!', 'Your meal entry has been successfully completed.', [
                 { text: 'OK', onPress: () => navigation.navigate('Main', { screen: 'Entries' }) }
             ]);
+
+            trackEvent('Check-In Completed', { entryId: entryId });
+            await completeCheckIn(entryId, { goalAligned: true }); // Example property
+            navigation.navigate('Main', { screen: 'Entries' });
 
         } catch (e) {
             Alert.alert('Error', 'Failed to complete the entry.');

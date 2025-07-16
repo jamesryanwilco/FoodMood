@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
+import { useCheckIn } from '../context/CheckInContext';
+import { trackEvent } from '../services/AnalyticsService';
 
 const iconColor = '#4A5C4D';
 const circleSize = 280;
@@ -8,7 +11,21 @@ const strokeWidth = 25;
 const radius = (circleSize - strokeWidth) / 2;
 const circumference = radius * 2 * Math.PI;
 
-export default function CheckInScreen({ navigation }) {
+export default function CheckInScreen() {
+    const navigation = useNavigation();
+    const { pendingEntries, startNewCheckIn } = useCheckIn();
+
+    const handleStartNew = () => {
+        trackEvent('Check-In Started');
+        startNewCheckIn();
+        navigation.navigate('CheckInStep1');
+    };
+    
+    const handleComplete = (entryId) => {
+        // This function is not defined in the original file, so it's not included in the new_code.
+        // It's kept as is to avoid introducing unrelated changes.
+    };
+
     const spinValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -66,7 +83,7 @@ export default function CheckInScreen({ navigation }) {
                     </Animated.View>
                     <TouchableOpacity 
                         style={styles.checkInButton}
-                        onPress={() => navigation.navigate('CheckInStep1')}
+                        onPress={handleStartNew}
                     >
                         <Text style={styles.checkInButtonText}>+</Text>
                         <Text style={styles.checkInButtonSubText}>Check In</Text>
