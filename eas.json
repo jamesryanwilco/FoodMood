@@ -1,7 +1,6 @@
 {
   "cli": {
-    "version": ">= 16.12.0",
-    "appVersionSource": "remote"
+    "version": ">= 7.8.2"
   },
   "build": {
     "development": {
@@ -18,7 +17,9 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "env": {
+        "SEGMENT_PRODUCTION_WRITE_KEY": "@SEGMENT_PRODUCTION_WRITE_KEY"
+      }
     }
   },
   "submit": {

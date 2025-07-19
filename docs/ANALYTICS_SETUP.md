@@ -1,56 +1,55 @@
 # 📈 Analytics Integration Guide
 
-This document outlines the analytics setup implemented in the FoodMood app using Segment.
+This document outlines the analytics setup implemented in the FoodMood app using Segment, with Mixpanel as the primary analytics destination.
 
 ## 1. Overview
 
-To provide flexible and powerful analytics without tightly coupling the app to a single service like Google Analytics, we've integrated **Segment**. Segment acts as a central hub for collecting user data. You write tracking code once, and then you can send that data to hundreds of tools (including Google Analytics, Mixpanel, etc.) by flipping a switch in the Segment web dashboard—no new app releases required.
+To provide flexible and powerful analytics, we use **Segment** as a central hub (Customer Data Platform). The app sends tracking data once to Segment's servers. From there, we can control where the data is sent without needing to release new app versions.
 
-## 2. Core Components
+Our primary analytics destination is **Mixpanel**, which provides reliable, real-time event tracking and user behavior analysis.
 
-The analytics integration consists of two main parts:
+## 2. Recommended Destination: Mixpanel
 
--   **Segment SDK (`@segment/analytics-react-native`)**: The official library for sending data to Segment from a React Native application.
--   **Analytics Service (`src/services/AnalyticsService.js`)**: A custom module created to centralize all analytics-related code. This service wraps the Segment SDK and provides simple, reusable functions for tracking events, identifying users, and tracking screen views.
+**Mixpanel is our confirmed and recommended analytics tool.**
 
-## 3. How It Works
+*   **Reliable Real-Time Data:** Events from the app appear in Mixpanel's "Live View" within seconds, which is essential for testing and debugging.
+*   **Works with Cloud-Mode:** It integrates seamlessly with our current Segment setup (Cloud-Mode), where the app sends data to Segment's servers first.
+*   **No Extra App Code:** No additional SDKs or configuration are needed in the app itself. The connection is managed entirely within the Segment dashboard.
 
-### Initialization
+## 3. Core App Components
 
--   Segment is initialized once when the app first launches in **`App.js`**.
--   The configuration, including your **Segment Write Key**, is managed in `src/services/AnalyticsService.js`. The `trackAppLifecycleEvents: true` option is enabled to automatically capture key events like "Application Opened," "Application Installed," and "Application Updated."
+The analytics integration within the app itself consists of two main parts:
 
-### Automatic Screen Tracking
-
--   To automatically track every screen a user visits, the `<NavigationContainer>` in **`App.js`** is monitored.
--   The `onStateChange` event fires whenever the user navigates, and the `analyticsScreen()` function is called with the new screen's name.
-
-### Custom Event Tracking
-
-We have implemented tracking for key user actions to provide insight into feature engagement:
-
-1.  **`Check-In Started`**
-    -   **File**: `src/screens/CheckInScreen.js`
-    -   **Trigger**: Fired when a user presses the button to start a new meal check-in.
-
-2.  **`Check-In Completed`**
-    -   **File**: `src/screens/checkin/Phase2_Step2_GoalScreen.js`
-    -   **Trigger**: Fired when a user successfully completes the final step of a post-meal reflection.
-    -   **Properties**: Includes the `entryId` to link the event to a specific meal.
-
-### User Identification
-
--   **File**: `src/screens/onboarding/OnboardingScreen.js`
--   **Trigger**: A unique, anonymous user ID is generated and sent to Segment via an `identify()` call when a user completes the onboarding flow.
--   This ensures that all subsequent events are tied to the same user profile, allowing you to analyze user journeys over time.
+*   **Segment SDK (`@segment/analytics-react-native`)**: The official library for sending data to Segment from a React Native application.
+*   **Analytics Service (`src/services/AnalyticsService.js`)**: A custom module created to centralize all analytics-related code. This service wraps the Segment SDK and provides simple, reusable functions for tracking events, identifying users, and tracking screen views.
 
 ## 4. How to Use and Extend
 
--   **Adding New Events**: To track a new event, import the `trackEvent` function from the analytics service and call it:
+*   **Adding New Events**: To track a new event, import the `trackEvent` function from the analytics service and call it anywhere in the app:
     ```javascript
     import { trackEvent } from '../services/AnalyticsService';
 
     // ... later in your component
     trackEvent('Your Event Name', { customProperty: 'value' });
     ```
--   **Viewing Data**: Log in to your Segment account to see a live stream of events in the "Debugger" tab. From the "Destinations" tab, you can connect your Segment source to Google Analytics or other tools to begin analysis. 
+*   **Viewing Data**: Log in to your **Mixpanel** project and use the **Events** or **Live View** reports to see a real-time stream of data from the app.
+
+---
+
+## Appendix: Google Analytics 4 (Cloud-Mode) - Lessons Learned
+
+We initially attempted to use the **Google Analytics 4 (Actions)** destination in **Cloud-Mode**. While Segment reported that events were "delivered," they never appeared in any GA4 reports (including `DebugView` and standard reports after a 24-hour wait).
+
+### Root Cause
+
+The issue is a fundamental limitation in how Google Analytics processes data for **mobile app streams**.
+
+*   Our Cloud-Mode setup sends data from Segment's servers to Google's servers (a server-to-server request).
+*   Google's backend identifies that the data is for a mobile app stream but is not coming directly from a recognized mobile device with a native Firebase SDK instance.
+*   As a result, Google's servers accept the request (leading to a "Delivered" status in Segment) but then **silently discard the event** because it fails this validation check.
+
+The **GA4 `DebugView` does not display server-to-server events**, which made this issue very difficult to diagnose.
+
+### Conclusion
+
+To successfully send data to a GA4 mobile stream, a **Device-Mode** implementation is required. This involves installing the native Firebase SDK in the app, which was a step we chose to avoid in favor of the simpler, more flexible integration with Mixpanel. 

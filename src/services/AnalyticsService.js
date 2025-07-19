@@ -1,7 +1,17 @@
 import { createClient } from '@segment/analytics-react-native';
+import Constants from 'expo-constants';
+
+const getSegmentWriteKey = () => {
+  if (Constants.expoConfig.extra?.SEGMENT_PRODUCTION_WRITE_KEY) {
+    // Production key is available
+    return Constants.expoConfig.extra.SEGMENT_PRODUCTION_WRITE_KEY;
+  }
+  // Fallback to development key
+  return 'JzrAERrnyMRBPrOpaddiL57Cu3MxRV4g'; // Your development key
+};
 
 const segmentClient = createClient({
-  writeKey: 'JzrAERrnyMRBPrOpaddiL57Cu3MxRV4g', 
+  writeKey: getSegmentWriteKey(),
   trackAppLifecycleEvents: true,
 });
 

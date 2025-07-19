@@ -1,39 +1,43 @@
 # Privacy Policy for The Check-In
 
-**Last Updated:** June 24, 2025
+**Last Updated:** July 18, 2025
 
 This Privacy Policy describes how your personal information is handled in The Check-In mobile application (the "App").
 
-## 1. Data We Do Not Collect
+## 1. Our Approach to Privacy
 
-We have a simple approach to privacy: we do not collect any personally identifiable information. When you use our App, we **do not** collect, store, or have access to:
+Your privacy is important to us. Our goal is to provide you with a powerful tool for mindful eating while collecting only the minimum data necessary to improve our app and your experience.
 
-*   Your name, email address, phone number, or other personal contact information.
-*   Your location data.
-*   Your photos or contacts.
-*   Any financial information.
-*   Any data related to your health via Apple's HealthKit or other services.
+## 2. Data You Provide (Stored Locally)
 
-## 2. Data You Provide
+The core functionality of the App is to allow you to record your own experiences. All data you enter into the App, including but not limited to meal descriptions, emotions, motivations, energy levels, goals, and notes, is stored **only on your local device**. This data is not transmitted to us or any third party. We do not have access to it. It remains on your device and is under your control.
 
-The core functionality of the App is to allow you to record your own experiences. All data you enter into the App, including but not limited to meal descriptions, emotions, motivations, energy levels, goals, and notes, is stored **only on your local device**.
+## 3. Data We Collect for Analytics
 
-This data is not transmitted to us or any third party. We do not have access to it. It remains on your device and is under your control.
+To understand how our app is used and to identify areas for improvement, we collect anonymized analytics data about user interactions. This helps us understand which features are popular, diagnose problems, and enhance the overall user experience. The data we collect for analytics includes:
 
-## 3. Data Collected for App Functionality
+*   **Product Interaction Data:** Such as which screens are viewed or when a core feature (like completing a check-in) is used.
+*   **Identifiers:** We use an anonymous User ID and Device ID to distinguish between different users and devices for analytical purposes. These IDs are not linked to your real-world identity.
+*   **Coarse Location:** We collect non-specific location data (like your country or city) based on your IP address. We do not collect your precise GPS location.
+*   **Diagnostic Data:** This includes anonymous crash logs and performance data (e.g., app version, device type) to help us find and fix bugs.
 
-To provide core features, the App may interact with a limited amount of technical data.
+## 4. Third-Party Services
 
-*   **Device ID for Notifications:** If you choose to set a reminder, the app uses your device's operating system to schedule a local notification. This process may involve the use of your device's unique identifier to deliver the notification correctly. This identifier is used solely for the purpose of scheduling and delivering reminders as requested by you and is not used for tracking or any other purpose.
+We use the following third-party services to process our analytics data:
 
-## 4. Data Storage
+*   **Segment:** A customer data platform that helps us manage and route our analytics data.
+*   **Mixpanel:** A product analytics tool that helps us analyze the usage data to improve our app.
 
-All user-entered data is stored locally on your device using on-device storage. If you delete the App, this data will also be deleted.
+These services are contractually obligated to handle your data securely and are prohibited from sharing it.
 
-## 5. Changes to This Privacy Policy
+## 5. Your Consent
+
+By using the App, you consent to the collection and use of information in accordance with this policy.
+
+## 6. Changes to This Privacy Policy
 
 We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
 
-## 6. Contact Us
+## 7. Contact Us
 
 If you have any questions about this Privacy Policy, you can contact us. 
