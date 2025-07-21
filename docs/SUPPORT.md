@@ -10,11 +10,11 @@ A: Currently, all data is stored locally on your device. To manage entries, you 
 **Q: Is my data private?**  
 A: Yes. The content of your entries (meal descriptions, emotions, etc.) is stored only on your device. We only collect anonymized analytics to improve the app, as detailed in our Privacy Policy.
 
-## Contact Us
+
 
 If you have any questions, feedback, or need assistance, please do not hesitate to reach out.
 
-*   **Email for Support:** [Enter Your Support Email Here]
-*   **Feedback & Suggestions:** [Enter Your Feedback Email Here, or the same one]
+*   **Email for Support:** [jamesryanwilco@gmail.com]
+*   **Feedback & Suggestions:** [jamesryanwilco@gmail.com]
 
 We appreciate you being a part of our community and will do our best to respond to you as soon as possible. 
