@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { SparklesIcon, ClockIcon, Battery50Icon, FireIcon } from 'react-native-heroicons/outline';
+import { useCheckIn } from '../../context/CheckInContext';
 
 const iconColor = '#4A5C4D';
 
@@ -28,14 +29,16 @@ const LevelGauge = ({ label, icon, value, onValueChange, minimumTrackTintColor, 
 
 export default function Phase2_Step1_ExperienceScreen({ navigation, route }) {
     const { entryId } = route.params;
+    const { updatePhase2Data } = useCheckIn();
     const [mindfulness, setMindfulness] = useState(5);
     const [eatingSpeed, setEatingSpeed] = useState(5);
     const [energy, setEnergy] = useState(5);
     const [fullness, setFullness] = useState(5);
 
-    const handleNext = () => {
+    const handleNext = async () => {
         const experienceData = { mindfulness, eatingSpeed, energy, fullness };
-        navigation.navigate('CompleteStep1a', { entryId, experienceData });
+        await updatePhase2Data(entryId, experienceData);
+        navigation.navigate('CompleteStep1a', { entryId });
     };
 
     return (

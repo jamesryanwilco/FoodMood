@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
+import { Cog6ToothIcon } from 'react-native-heroicons/outline';
 import { useCheckIn } from '../context/CheckInContext';
 import { trackEvent } from '../services/AnalyticsService';
 
@@ -54,8 +55,17 @@ export default function CheckInScreen() {
         outputRange: ['0deg', '360deg'],
     });
 
+    const handleSettingsPress = () => {
+        navigation.navigate('Settings');
+    };
+
     return (
         <View style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={handleSettingsPress} style={styles.settingsButton}>
+                    <Cog6ToothIcon color={iconColor} size={28} />
+                </TouchableOpacity>
+            </View>
             <View style={styles.content}>
                 <Text style={styles.title}>How are you feeling?</Text>
                 
@@ -101,6 +111,15 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5F5E9',
         justifyContent: 'space-between',
+    },
+    header: {
+        position: 'absolute',
+        top: 60,
+        right: 20,
+        zIndex: 10,
+    },
+    settingsButton: {
+        padding: 10,
     },
     content: {
         flex: 1,

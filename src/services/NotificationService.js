@@ -1,5 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Platform, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { calculateStreak } from '../utils/streakUtils';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -39,6 +41,39 @@ export async function registerForPushNotificationsAsync() {
     // console.log(token);
 
     return token;
+}
+
+export async function scheduleGeneralReminder() {
+    // First, cancel any existing general reminder to avoid duplicates
+    await cancelGeneralReminder();
+
+    const existingEntries = await AsyncStorage.getItem('pending_entries');
+    const allEntries = existingEntries ? JSON.parse(existingEntries) : [];
+    const completedEntries = allEntries.filter(e => e.status === 'completed');
+    const streak = calculateStreak(completedEntries);
+
+    let body = "Don't forget to check in with your food and mood today!";
+    if (streak > 0) {
+        body = `You're on a ${streak}-day streak! Keep it going by checking in today.`;
+    }
+
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title: 'Mindful Eating Reminder',
+            body: body,
+            data: { type: 'general_reminder' },
+        },
+        trigger: {
+            hour: 12, // 12:00 PM
+            minute: 0,
+            repeats: true,
+        },
+        identifier: 'general-reminder',
+    });
+}
+
+export async function cancelGeneralReminder() {
+    await Notifications.cancelScheduledNotificationAsync('general-reminder');
 }
 
 export async function scheduleMealCompletionReminder(entryId, completionTime) {

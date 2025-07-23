@@ -1,6 +1,6 @@
 # 📈 Analytics Integration Guide
 
-This document outlines the analytics setup implemented in the FoodMood app using Segment, with Mixpanel as the primary analytics destination.
+This document outlines the analytics setup implemented in the Awara app using Segment, with Mixpanel as the primary analytics destination.
 
 ## 1. Overview
 

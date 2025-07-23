@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { emotionMatrix } from '../../data/emotions';
 import { BoltIcon, UserMinusIcon, QuestionMarkCircleIcon, FaceSmileIcon, MinusCircleIcon, FaceFrownIcon, FireIcon, BeakerIcon, MoonIcon } from 'react-native-heroicons/outline';
+import { useCheckIn } from '../../context/CheckInContext';
 
 const iconColor = '#4A5C4D';
 
@@ -78,53 +79,20 @@ const GuidedDiscovery = ({ onComplete }) => {
     );
 };
 
-const QuickSelection = ({ onSelectionChange, selectedEmotions }) => {
-    const groupedEmotions = useMemo(() => {
-        return emotionMatrix.reduce((acc, curr) => {
-            const group = acc[curr.state] || [];
-            curr.words.forEach(word => {
-                if (!group.includes(word)) group.push(word);
-            });
-            acc[curr.state] = group;
-            return acc;
-        }, {});
-    }, []);
-
-    return (
-        <ScrollView>
-            {Object.entries(groupedEmotions).map(([state, words]) => (
-                <View key={state} style={styles.groupContainer}>
-                    <Text style={styles.groupTitle}>{state}</Text>
-                    <View style={styles.resultsContainer}>
-                        {words.map(emotion => (
-                            <TouchableOpacity 
-                                key={emotion}
-                                style={[styles.emotionTag, selectedEmotions.includes(emotion) && styles.emotionTagSelected]}
-                                onPress={() => onSelectionChange(emotion)}
-                            >
-                                <Text style={[styles.emotionTagText, selectedEmotions.includes(emotion) && styles.emotionTagTextSelected]}>{emotion}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
-            ))}
-        </ScrollView>
-    )
-};
-
 export default function Phase2_Step1a_EmotionScreen({ navigation, route }) {
-    const { entryId, experienceData } = route.params;
+    const { entryId } = route.params;
+    const { updatePhase2Data } = useCheckIn();
     const [mode, setMode] = useState(null); // 'guided' or 'quick'
     const [selectedEmotions, setSelectedEmotions] = useState([]);
     const [emotionResult, setEmotionResult] = useState([]);
     
-    const handleNext = () => {
+    const handleNext = async () => {
         if (selectedEmotions.length === 0) {
             Alert.alert("Emotion Required", "Please select at least one emotion to continue.");
             return;
         }
-        const updatedExperienceData = { ...experienceData, emotionsAfter: selectedEmotions };
-        navigation.navigate('CompleteStep2', { entryId, experienceData: updatedExperienceData });
+        await updatePhase2Data(entryId, { emotionsAfter: selectedEmotions });
+        navigation.navigate('CompleteStep2', { entryId });
     };
 
     const handleEmotionToggle = (emotion) => {
@@ -162,9 +130,9 @@ export default function Phase2_Step1a_EmotionScreen({ navigation, route }) {
     if (!mode) {
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>How do you feel after eating?</Text>
+                <Text style={styles.title}>How do you want to find your emotion now?</Text>
                 <SelectionCard label="Guided Discovery" onPress={() => setMode('guided')} style={styles.modeCard} />
-                <SelectionCard label="Quick Selection" onPress={() => setMode('quick')} style={styles.modeCard}/>
+                <SelectionCard label="Mood Meter" onPress={() => navigation.navigate('CompleteStep1ba', { entryId })} style={styles.modeCard}/>
             </View>
         );
     }
@@ -172,18 +140,6 @@ export default function Phase2_Step1a_EmotionScreen({ navigation, route }) {
     return (
         <View style={styles.container}>
             {mode === 'guided' && <GuidedDiscovery onComplete={setEmotionResult} />}
-            {mode === 'quick' && (
-                <>
-                    <Text style={styles.title}>What are you feeling now?</Text>
-                    <QuickSelection onSelectionChange={handleEmotionToggle} selectedEmotions={selectedEmotions} />
-                    <TouchableOpacity 
-                        style={styles.nextButton}
-                        onPress={handleNext}
-                    >
-                        <Text style={styles.nextButtonText}>Next</Text>
-                    </TouchableOpacity>
-                </>
-            )}
         </View>
     );
 }

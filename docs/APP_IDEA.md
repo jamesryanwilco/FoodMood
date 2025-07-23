@@ -1,10 +1,10 @@
-# 🧠 Food & Mood Tracker – Current Summary
+# 🧠 Awara – Current Summary
 
 ## 🌱 What It Is
 
 A mindful eating companion that helps users reflect on how food affects their mood, energy, and emotions — without calorie counting, restriction, or judgment.
 
-## 📲 What the App Does
+## �� What the App Does
 
 ### Two-Part Meal Check-Ins
 

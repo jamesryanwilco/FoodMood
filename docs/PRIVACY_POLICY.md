@@ -1,8 +1,8 @@
-# Privacy Policy for The Check-In
+# Privacy Policy for Awara
 
 **Last Updated:** July 18, 2025
 
-This Privacy Policy describes how your personal information is handled in The Check-In mobile application (the "App").
+This Privacy Policy describes how your personal information is handled in the Awara mobile application (the "App").
 
 ## 1. Our Approach to Privacy
 

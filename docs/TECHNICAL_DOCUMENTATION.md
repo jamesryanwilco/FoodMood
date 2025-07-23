@@ -70,3 +70,19 @@ The `src` directory is organized to separate concerns and improve maintainabilit
 -   `@react-native-community/slider`: For the sliders used in the check-in process.
 -   `@react-native-segmented-control/segmented-control`: For the "Pending/Completed" tabs on the Entries screen and the date filter on the Insights screen.
 -   `uuid`, `react-native-get-random-values`: For generating unique IDs for each entry. 
+
+### Settings & Notifications
+- `SettingsScreen.js`: A new screen providing users with options to manage their preferences. It features a dark mode theme and includes toggles for notification permissions and general reminders.
+- `NotificationService.js`: Enhanced to support daily, repeating general reminders. It includes logic to schedule a notification at noon and includes the user's current streak in the message.
+- `streakUtils.js`: A new utility to centralize the streak calculation logic, which is now used by both the `InsightsScreen` and the `NotificationService`.
+
+### Interactive Mood Meter
+The `MoodMeterGrid.js` component has been significantly refactored to create a more interactive and intuitive user experience.
+
+- **Gesture Handling**: The component now uses the `GestureDetector` API from `react-native-gesture-handler` to manage user interactions. It combines a `PinchGesture` for zooming and a `TapGesture` (implemented via `Pressable`) for selection.
+- **Assisted Zoom**: The zoom is now "assisted," meaning it automatically centers on the currently selected emotion.
+  - The `useEffect` hook tracks changes to the `selectedValue` prop.
+  - When the selection changes, it calculates the target coordinates and uses `withTiming` to smoothly animate the grid's position.
+- **Conditional Panning**: The centering translation is only applied when the grid is zoomed in (`scale > 1`). An `interpolate` function is used to create a smooth transition as the user starts and ends their zoom.
+- **Cell Selection**: The grid cells are now `Pressable` components. The `onCellPress` callback is passed up to the parent screen, which then updates the slider values.
+- **Optimized Selection Style**: The `transform` property on the selected cell has been replaced with a thicker border and a larger font size to provide a clean, crisp selection effect without any rendering glitches. 

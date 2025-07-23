@@ -62,4 +62,17 @@ This document tracks the development status of the app's core features.
 
 ### Settings & Personalization
 -   **User Profile & Intentions:** Allow users to set or update their primary intention/goal.
--   **Data Export:** Option for users to export their data. 
+-   **Data Export:** Option for users to export their data.
+- **Settings Screen**: A dedicated screen to manage app preferences.
+- **Notification Controls**: Users can enable or disable all notifications from the app.
+- **General Reminders**: An option to receive a daily reminder at noon to encourage regular check-ins. The reminder message includes the user's current streak to foster engagement.
+
+### Enhanced Mood Selection
+- **Interactive Mood Meter**: The mood meter is now fully interactive.
+- **Pinch-to-Zoom**: Users can pinch to zoom into the mood grid for a closer look.
+- **Tap to Select**: Tapping on any emotion in the grid instantly updates the sliders to the corresponding values.
+- **Assisted Zoom**: The zoom functionality is centered on the currently selected emotion, and the grid automatically pans to keep the selection in view as the user moves the sliders.
+- **Improved Selection UI**: The selected emotion is highlighted with a clean, crisp border and larger text, avoiding any blurriness or distortion.
+## How to Use
+
+The app is designed to be intuitive. Upon first opening, you'll be guided through a brief onboarding process to set up your initial goals. After that, you can start checking in with your meals immediately. 

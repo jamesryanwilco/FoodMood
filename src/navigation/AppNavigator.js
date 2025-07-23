@@ -5,14 +5,17 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import MainTabNavigator from './MainTabNavigator';
 import Step1_BasicInfoScreen from '../screens/checkin/Step1_BasicInfoScreen';
 import Step2_EmotionScreen from '../screens/checkin/Step2_EmotionScreen';
+import Step2a_MoodMeterScreen from '../screens/checkin/Step2a_MoodMeterScreen';
 import Step3_PhysicalStateScreen from '../screens/checkin/Step3_PhysicalStateScreen';
 import Step4_MotivationsScreen from '../screens/checkin/Step4_MotivationsScreen';
 import Step5_ReminderScreen from '../screens/checkin/Step5_ReminderScreen';
 import Phase2_Step1_ExperienceScreen from '../screens/checkin/Phase2_Step1_ExperienceScreen';
 import Phase2_Step1a_EmotionScreen from '../screens/checkin/Phase2_Step1a_EmotionScreen';
+import Phase2_Step1ba_MoodMeterScreen from '../screens/checkin/Phase2_Step1ba_MoodMeterScreen';
 import Phase2_Step2_GoalScreen from '../screens/checkin/Phase2_Step2_GoalScreen';
 import SelectGoalsScreen from '../screens/SelectGoalsScreen';
 import ViewGoalsScreen from '../screens/ViewGoalsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 import { COLORS } from '../constants/theme';
 
 const Stack = createStackNavigator();
@@ -41,6 +44,14 @@ export default function AppNavigator() {
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Main" component={MainTabNavigator} />
       <Stack.Screen 
+        name="Settings" 
+        component={SettingsScreen} 
+        options={{ 
+          presentation: 'modal',
+          headerShown: false, 
+        }}
+      />
+      <Stack.Screen 
         name="CheckInStep1" 
         component={Step1_BasicInfoScreen} 
         options={commonHeaderOptions}
@@ -48,6 +59,11 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="CheckInStep2" 
         component={Step2_EmotionScreen} 
+        options={commonHeaderOptions}
+      />
+      <Stack.Screen 
+        name="CheckInStep2a" 
+        component={Step2a_MoodMeterScreen} 
         options={commonHeaderOptions}
       />
       <Stack.Screen 
@@ -73,6 +89,11 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="CompleteStep1a" 
         component={Phase2_Step1a_EmotionScreen} 
+        options={commonHeaderOptions}
+      />
+      <Stack.Screen 
+        name="CompleteStep1ba" 
+        component={Phase2_Step1ba_MoodMeterScreen} 
         options={commonHeaderOptions}
       />
       <Stack.Screen 

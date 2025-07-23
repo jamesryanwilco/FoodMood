@@ -9,6 +9,7 @@ import { FireIcon, SunIcon, MoonIcon } from 'react-native-heroicons/solid';
 import { ArrowRightIcon } from 'react-native-heroicons/outline';
 import { XMarkIcon, SwatchIcon, BellAlertIcon } from 'react-native-heroicons/solid';
 import { LineChart } from 'react-native-chart-kit';
+import { calculateStreak } from '../utils/streakUtils';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -54,20 +55,27 @@ const findMostFrequent = (arr) => {
     return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
 };
 
-// Define a color map for motivations for consistency, aligned with app theme and all motivation options
+// Define a color map for motivations for consistency, aligned with the new motivation options
 const motivationColors = {
+    // Physical Reasons
     'Hunger': '#4CAF50',        // Green
-    'Stress': '#FF6B6B',        // Reddish Accent
-    'Celebration': '#E91E63',   // Pink
-    'Boredom': '#FFC107',       // Amber
-    'Craving': '#795548',       // Brown
-    'Social': '#FF9800',        // Orange
-    'Habit': '#AAB8C2',         // Light Grey
-    'Sadness': '#6B7AFF',       // Blue
-    'Tiredness': '#607D8B',     // Slate Blue/Grey
-    'Routine': '#9575CD',       // Light Purple
     'Energy': '#00BCD4',        // Cyan
+    'Health': '#81C784',        // Light Green
     'Performance': '#3F51B5',   // Indigo
+
+    // Emotional Reasons
+    'Comfort': '#FFB74D',       // Soft Orange
+    'Reward': '#E91E63',        // Pink
+    'Nostalgia': '#A1887F',     // Sepia/Brown
+    'Distraction': '#FFC107',   // Amber
+
+    // Environmental Reasons
+    'Social connection': '#FF9800',  // Orange
+    'Habit/routine': '#9575CD',   // Light Purple
+    'Marketing/cues': '#F44336',    // Red
+    'Convenience/availability': '#607D8B', // Slate Blue/Grey
+
+    // Default
     'Other': '#9E9E9E'          // Default Grey
 };
 
@@ -290,31 +298,7 @@ export default function InsightsScreen() {
       setDateRangeText(rangeText);
 
       // --- Streak Calculation ---
-      if (completedEntries.length > 0) {
-        // Get unique dates and sort them descending
-        const uniqueDates = [...new Set(completedEntries.map(e => e.date.split('T')[0]))];
-        const sortedDates = uniqueDates.map(d => parseISO(d)).sort((a, b) => b - a);
-
-        let streak = 0;
-        const today = new Date();
-        const mostRecentEntryDate = sortedDates[0];
-
-        // Streak can only exist if last entry was today or yesterday
-        if (differenceInCalendarDays(today, mostRecentEntryDate) <= 1) {
-          streak = 1;
-          for (let i = 1; i < sortedDates.length; i++) {
-            const dayDiff = differenceInCalendarDays(sortedDates[i-1], sortedDates[i]);
-            if (dayDiff === 1) {
-              streak++;
-            } else {
-              break; // Streak is broken
-            }
-          }
-        }
-        setStreakCount(streak);
-      } else {
-        setStreakCount(0);
-      }
+      setStreakCount(calculateStreak(completedEntries));
 
       // All calculations should now use the pre-filtered `filteredEntries`
       setTotalEntries(filteredEntries.length);

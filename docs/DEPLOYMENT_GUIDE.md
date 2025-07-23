@@ -46,15 +46,20 @@ The journey to a successful build involved several challenges. This section docu
     ```
     You must then explicitly use this profile when building: `eas build --profile development-simulator`.
 
+### App Name and Bundle ID Mismatches
+
+*   **Problem:** The app was rejected because the name in App Store Connect ("Awara") did not sufficiently match the name displayed on the device ("The Check-In").
+*   **Solution:** The `name` property in `app.json` must be updated to match the desired App Store name.
+
+*   **Problem:** The build failed because the `bundleIdentifier` in `app.json` was not registered to the Apple Developer account.
+*   **Solution:** The `bundleIdentifier` must be an exact match to the one registered in the Apple Developer Portal for the app. Any changes require a new app record.
+
 ---
 
 ## 4. Final App Store Submission Workflow
 
-Once all development and testing is complete, the final process is:
+Once all development and testing is complete, the final process is simplified with the EAS CLI:
 
-1.  **Create a Production Build:** Run `eas build --profile production --platform ios`. This creates the final, optimized `.ipa` file.
-2.  **Create the App Record:** In [App Store Connect](https://appstoreconnect.apple.com/), create a new app record. The **Bundle ID** must exactly match the `bundleIdentifier` in your `app.json`. The app name can be changed later.
-3.  **Upload the Build:** Use Apple's **Transporter** app on your Mac to upload the `.ipa` file from Step 1.
-4.  **Take Screenshots:** Use the simulator build (`.app` file) to run the app on various simulator devices and take screenshots (`Cmd + S`).
-5.  **Complete the Listing:** Fill out all required metadata on App Store Connect (description, keywords, privacy policy, etc.) and upload your screenshots.
-6.  **Submit:** Once the uploaded build has finished processing, select it and submit the app for review. 
+1.  **Create a Production Build:** Run `npx eas build --platform ios --profile production`. This creates the final, optimized `.ipa` file.
+2.  **Submit the Build:** Run `npx eas submit --platform ios`. This command will automatically find your latest build, upload it to App Store Connect, and guide you through the rest of the process.
+3.  **Complete the Listing:** In [App Store Connect](https://appstoreconnect.apple.com/), select the build you just uploaded, fill out the "What's New" text and any other required metadata, update the "App Privacy" section, and submit for review. 

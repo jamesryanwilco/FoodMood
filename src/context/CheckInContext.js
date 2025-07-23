@@ -46,6 +46,27 @@ export const CheckInProvider = ({ children }) => {
         resetCheckInData();
     };
 
+    const updatePhase2Data = async (entryId, newData) => {
+        try {
+            const existingEntries = await AsyncStorage.getItem('pending_entries');
+            let entries = existingEntries ? JSON.parse(existingEntries) : [];
+            
+            const entryIndex = entries.findIndex(e => e.id === entryId);
+
+            if (entryIndex === -1) {
+                console.error('Could not find entry to update');
+                return;
+            }
+
+            // Merge new data into the existing entry
+            entries[entryIndex] = { ...entries[entryIndex], ...newData };
+
+            await AsyncStorage.setItem('pending_entries', JSON.stringify(entries));
+        } catch (e) {
+            console.error("Failed to update phase 2 data:", e);
+        }
+    };
+
     const completeCheckIn = async (entryId, phase2Data) => {
         try {
             const existingEntries = await AsyncStorage.getItem('pending_entries');
@@ -79,6 +100,7 @@ export const CheckInProvider = ({ children }) => {
         startNewCheckIn,
         resetCheckInData,
         completeCheckIn,
+        updatePhase2Data,
     };
 
     return (
