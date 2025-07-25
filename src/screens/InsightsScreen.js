@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, Modal, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { PieChart } from 'react-native-chart-kit';
@@ -10,6 +10,8 @@ import { ArrowRightIcon } from 'react-native-heroicons/outline';
 import { XMarkIcon, SwatchIcon, BellAlertIcon } from 'react-native-heroicons/solid';
 import { LineChart } from 'react-native-chart-kit';
 import { calculateStreak } from '../utils/streakUtils';
+import { getInsightAnalysis } from '../services/InsightAnalysisService';
+import Markdown from 'react-native-markdown-display';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -100,6 +102,11 @@ export default function InsightsScreen() {
   const [howWeEatPlotData, setHowWeEatPlotData] = useState(null);
   const [isHowWeEatModalVisible, setIsHowWeEatModalVisible] = useState(false);
   const [selectedHowWeEatPoint, setSelectedHowWeEatPoint] = useState(null);
+  const [isAiModalVisible, setIsAiModalVisible] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [selectedMoodShift, setSelectedMoodShift] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const handleShiftPress = (shiftData) => {
     const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
@@ -151,6 +158,39 @@ export default function InsightsScreen() {
 
   const closeHowWeEatPlotModal = () => {
     setIsHowWeEatModalVisible(false);
+  };
+
+  const handleGenerateAnalysis = async () => {
+    setIsAiLoading(true);
+    setAiAnalysis('');
+    try {
+        const allEntries = await AsyncStorage.getItem('pending_entries');
+        const entries = allEntries ? JSON.parse(allEntries) : [];
+        const completedEntries = entries.filter(e => e.status === 'completed');
+
+        if (completedEntries.length < 5) {
+            Alert.alert("Not Enough Data", "You need at least 5 completed entries to generate an analysis.");
+            setIsAiLoading(false);
+            return;
+        }
+
+        const analysis = await getInsightAnalysis(completedEntries);
+        setAiAnalysis(analysis);
+    } catch (e) {
+        setAiAnalysis("Sorry, an error occurred while generating your analysis.");
+        console.error(e);
+    } finally {
+        setIsAiLoading(false);
+    }
+};
+    
+  const handleCloseAiModal = () => {
+    setIsAiModalVisible(false);
+    setAiAnalysis('');
+  };
+
+  const handleAnalyze = () => {
+    setIsAiModalVisible(true);
   };
 
   const loadData = useCallback(async () => {
@@ -531,6 +571,9 @@ export default function InsightsScreen() {
             <View style={styles.infoContainer}>
                 <Text style={styles.infoText}>The more you check in, the smarter your insights will become.</Text>
             </View>
+            <TouchableOpacity style={styles.aiButton} onPress={handleAnalyze}>
+                <Text style={styles.aiButtonText}>Analyze My Entries with AI</Text>
+            </TouchableOpacity>
         </ScrollView>
         <Modal
             animationType="slide"
@@ -677,6 +720,41 @@ export default function InsightsScreen() {
                             </View>
                         </View>
                     )}
+                </View>
+            </View>
+        </Modal>
+
+        {/* AI Analysis Modal */}
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isAiModalVisible}
+            onRequestClose={handleCloseAiModal}
+        >
+            <View style={styles.modalContainer}>
+                <View style={styles.modalView}>
+                    <Text style={styles.modalTitle}>AI-Powered Analysis</Text>
+                    
+                    {isAiLoading ? (
+                        <ActivityIndicator size="large" color="#4A5C4D" />
+                    ) : aiAnalysis ? (
+                        <ScrollView style={styles.analysisScrollView}>
+                            <Markdown>{aiAnalysis}</Markdown>
+                        </ScrollView>
+                    ) : (
+                        <>
+                            <Text style={styles.modalSubtitle}>
+                                Get personalized insights based on your recent entries.
+                            </Text>
+                            <TouchableOpacity style={styles.generateButton} onPress={handleGenerateAnalysis}>
+                                <Text style={styles.generateButtonText}>Generate My Insights</Text>
+                            </TouchableOpacity>
+                        </>
+                    )}
+                    
+                    <TouchableOpacity onPress={handleCloseAiModal} style={styles.closeButton}>
+                        <Text style={styles.closeButtonText}>Close</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </Modal>
@@ -979,5 +1057,75 @@ const styles = StyleSheet.create({
     color: '#4A5C4D',
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  aiButton: {
+    backgroundColor: '#FF6B6B',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  aiButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 25,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontFamily: 'serif',
+    fontWeight: 'bold',
+    color: '#4A5C4D',
+    marginBottom: 15,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    fontFamily: 'serif',
+    color: '#4A5C4D',
+    textAlign: 'center',
+    marginBottom: 25,
+  },
+  generateButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    marginBottom: 15,
+  },
+  generateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    marginTop: 10,
+  },
+  closeButtonText: {
+    color: '#AAB8C2',
+    fontSize: 16,
+  },
+  analysisScrollView: {
+    width: '100%',
+    marginBottom: 20,
   },
 }); 
