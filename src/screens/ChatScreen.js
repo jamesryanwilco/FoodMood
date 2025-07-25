@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, SafeAreaView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, SafeAreaView, Alert, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getChatbotResponse } from '../services/OpenAIService';
 import { PaperAirplaneIcon, ArrowPathIcon } from 'react-native-heroicons/solid';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useNavigation } from '@react-navigation/native';
+import Markdown from 'react-native-markdown-display';
 
 const darkColors = {
     background: '#121212',
@@ -17,7 +18,7 @@ const darkColors = {
 };
 
 const CHAT_HISTORY_KEY = 'chat_history';
-const initialMessage = { role: 'assistant', content: "Hello! I'm your mindful eating assistant. How can I help you today?" };
+const initialMessage = { role: 'assistant', content: "Hello! I'm your mindful eating assistant. How can I help you today?", isInitial: true };
 
 export default function ChatScreen() {
     const navigation = useNavigation();
@@ -103,14 +104,33 @@ export default function ChatScreen() {
         setIsLoading(false);
     }, [input, messages]);
 
-    const renderMessage = ({ item }) => (
-        <View style={[
-            styles.messageContainer,
-            item.role === 'user' ? styles.userMessageContainer : styles.botMessageContainer
-        ]}>
-            <Text style={styles.messageText}>{item.content}</Text>
-        </View>
-    );
+    const renderMessage = ({ item }) => {
+        // Special case for the initial message with an avatar
+        if (item.isInitial) {
+            return (
+                <View style={[styles.messageContainer, styles.botMessageContainer, styles.initialMessageContainer]}>
+                    <Image source={require('../../assets/splash-icon.png')} style={styles.avatar} />
+                    <View style={{ flex: 1 }}>
+                        <Markdown style={markdownStyles}>{item.content}</Markdown>
+                    </View>
+                </View>
+            );
+        }
+
+        // Default rendering for all other messages
+        return (
+            <View style={[
+                styles.messageContainer,
+                item.role === 'user' ? styles.userMessageContainer : styles.botMessageContainer
+            ]}>
+                {item.role === 'assistant' ? (
+                    <Markdown style={markdownStyles}>{item.content}</Markdown>
+                ) : (
+                    <Text style={styles.messageText}>{item.content}</Text>
+                )}
+            </View>
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -165,17 +185,27 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginHorizontal: 10,
         marginVertical: 5,
-        maxWidth: '80%',
     },
     userMessageContainer: {
         backgroundColor: darkColors.userBubble,
         alignSelf: 'flex-end',
         borderBottomRightRadius: 5,
+        maxWidth: '80%', // Added here to constrain only user messages
     },
     botMessageContainer: {
         backgroundColor: darkColors.botBubble,
         alignSelf: 'flex-start',
         borderBottomLeftRadius: 5,
+    },
+    initialMessageContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatar: {
+        width: 70,
+        height: 70,
+        borderRadius: 20,
+        marginRight: 10,
     },
     messageText: {
         color: darkColors.text,
@@ -207,5 +237,31 @@ const styles = StyleSheet.create({
         backgroundColor: darkColors.surface,
         borderRadius: 25,
         padding: 10,
+    },
+}); 
+
+const markdownStyles = StyleSheet.create({
+    body: {
+        color: darkColors.text,
+        fontSize: 16,
+    },
+    heading1: {
+        color: darkColors.primary,
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 5,
+    },
+    strong: {
+        fontWeight: 'bold',
+    },
+    list_item: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 5,
+    },
+    bullet_list_icon: {
+        color: darkColors.text,
+        marginRight: 5,
     },
 }); 

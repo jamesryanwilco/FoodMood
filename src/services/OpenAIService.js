@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { OPENAI_API_KEY } from '@env';
 
 // --- IMPORTANT: API KEY INSTRUCTIONS ---
 // 1.  DO NOT commit your API key to GitHub.
@@ -10,7 +11,7 @@ import OpenAI from 'openai';
 //     but for now, you can paste it directly here for testing in Expo Go.
 //     However, REMEMBER TO REMOVE IT before committing.
 
-const apiKey = "YOUR_API_KEY_HERE"; // <-- PASTE TEMPORARILY FOR EXPO GO
+const apiKey = OPENAI_API_KEY;
 
 const openai = new OpenAI({
   apiKey: apiKey,
@@ -24,7 +25,7 @@ const openai = new OpenAI({
 export async function getChatbotResponse(conversation) {
   // For now, let's return a hardcoded response to test the UI.
   // This avoids the need for a live API key during initial development.
-  if (false) { 
+  if (apiKey === "YOUR_API_KEY_HERE") { 
     return new Promise(resolve => {
       setTimeout(() => {
         const lastUserMessage = conversation[conversation.length - 1]?.content.toLowerCase();
@@ -44,7 +45,7 @@ export async function getChatbotResponse(conversation) {
         { 
           role: 'system', 
           content: `
-You are a warm, non-judgmental AI guide named "AwareAI," trained in mindful eating, emotional awareness, and user-centred coaching for the app "The Check-In." You support users in understanding how to use the app and deepen their understanding of mindful eating. Your tone is calm, compassionate, and clear.
+You are a warm, non-judgmental AI guide named "AwarAI," trained in mindful eating, emotional awareness, and user-centred coaching for the app "Awara." You support users in understanding how to use the app and deepen their understanding of mindful eating. Your tone is calm, compassionate, and clear.
 
 ### Your Role
 - Help users understand app features, mindful eating concepts, and how to build habits around awareness.
@@ -96,6 +97,7 @@ You are a warm, non-judgmental AI guide named "AwareAI," trained in mindful eati
         ...conversation,
       ],
       model: 'gpt-4o-mini', // Using the latest, cost-effective model
+      temperature: 0.1, // Added to make responses more focused but still warm
     });
 
     return completion.choices[0]?.message?.content || "Sorry, I couldn't get a response.";
