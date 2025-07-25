@@ -1,10 +1,12 @@
 import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { FlagIcon } from 'react-native-heroicons/outline';
 import PageContainer from '../components/PageContainer';
 import { COLORS, FONTS, SPACING, BORDERS } from '../constants/theme';
+import DraggableFlatList from 'react-native-draggable-flatlist';
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { TrashIcon } from 'react-native-heroicons/outline';
 
 const GOALS_STORAGE_KEY = 'user_goals';
 
@@ -15,15 +17,18 @@ const medalColors = {
 };
 
 export default function ViewGoalsScreen({ navigation }) {
-    const [savedGoals, setSavedGoals] = React.useState({ selected: [], custom: '' });
+    const [savedGoals, setSavedGoals] = React.useState({ selected: [], custom: [] });
 
     const loadGoals = async () => {
         try {
             const storedGoals = await AsyncStorage.getItem(GOALS_STORAGE_KEY);
             if (storedGoals) {
-                setSavedGoals(JSON.parse(storedGoals));
+                const { selected, custom } = JSON.parse(storedGoals);
+                // Ensure custom goals are always an array
+                const customArray = Array.isArray(custom) ? custom : (custom ? [custom] : []);
+                setSavedGoals({ selected: selected || [], custom: customArray });
             } else {
-                setSavedGoals({ selected: [], custom: '' });
+                setSavedGoals({ selected: [], custom: [] });
             }
         } catch (e) {
             console.error('Failed to load goals.', e);
@@ -32,8 +37,35 @@ export default function ViewGoalsScreen({ navigation }) {
 
     useFocusEffect(useCallback(() => { loadGoals(); }, []));
 
-    const { selected = [], custom = '' } = savedGoals;
-    const hasGoals = selected.length > 0 || custom;
+    const handleDelete = async (goalToDelete) => {
+        const updatedSelectedGoals = savedGoals.selected.filter(goal => goal !== goalToDelete);
+        const newGoals = {
+            ...savedGoals,
+            selected: updatedSelectedGoals,
+        };
+        setSavedGoals(newGoals);
+        try {
+            await AsyncStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(newGoals));
+        } catch (e) {
+            console.error('Failed to save after deletion.', e);
+        }
+    };
+
+    const handleDragEnd = async (data) => {
+        const reorderedGoals = {
+            selected: data,
+            custom: savedGoals.custom,
+        };
+        setSavedGoals(reorderedGoals);
+        try {
+            await AsyncStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(reorderedGoals));
+        } catch (e) {
+            console.error('Failed to save reordered goals.', e);
+        }
+    };
+
+    const { selected = [], custom = [] } = savedGoals;
+    const hasGoals = selected.length > 0 || custom.length > 0;
 
     const renderGoal = (goal, index) => {
         const medal = ['🥇', '🥈', '🥉'][index];
@@ -45,40 +77,67 @@ export default function ViewGoalsScreen({ navigation }) {
         );
     };
 
+    const renderRightActions = (item) => (
+        <TouchableOpacity
+            onPress={() => handleDelete(item)}
+            style={styles.deleteBox}
+        >
+            <TrashIcon color={COLORS.white} size={24} />
+            <Text style={styles.deleteText}>Delete</Text>
+        </TouchableOpacity>
+    );
+
     return (
-        <PageContainer>
-            <ScrollView>
-                <FlagIcon size={48} color={COLORS.primary} style={styles.icon} />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <PageContainer>
+                <View style={styles.header} />
                 <Text style={styles.title}>Your Current Intentions</Text>
-
-                {hasGoals ? (
-                    <>
-                        {selected.map(renderGoal)}
-                        {custom ? (
-                            <View style={styles.goalCard}>
-                                <Text style={styles.customGoalLabel}>Your custom intention:</Text>
-                                <Text style={styles.goalText}>{custom}</Text>
-                            </View>
-                        ) : null}
-                    </>
-                ) : (
-                    <Text style={styles.noGoalsText}>
-                        You haven't set any intentions yet. Tap below to get started!
-                    </Text>
-                )}
-
+                <View style={styles.scrollContainer}>
+                    {hasGoals ? (
+                        <DraggableFlatList
+                            data={selected}
+                            renderItem={({ item, getIndex, drag }) => (
+                                <View style={{ marginBottom: SPACING.sm }}>
+                                    <Swipeable renderRightActions={() => renderRightActions(item)}>
+                                        <TouchableOpacity onLongPress={drag} disabled={!drag}>
+                                            {renderGoal(item, getIndex())}
+                                        </TouchableOpacity>
+                                    </Swipeable>
+                                </View>
+                            )}
+                            keyExtractor={(item) => item}
+                            onDragEnd={({ data }) => handleDragEnd(data)}
+                        />
+                    ) : (
+                        <Text style={styles.noGoalsText}>
+                            You haven't set any intentions yet. Tap below to get started!
+                        </Text>
+                    )}
+                     {custom.map((goal, index) => (
+                        <View key={index} style={[styles.goalCard, { marginTop: SPACING.md }]}>
+                            <Text style={styles.customGoalLabel}>Your custom intention:</Text>
+                            <Text style={styles.goalText}>{goal}</Text>
+                        </View>
+                    ))}
+                </View>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => navigation.navigate('SelectGoals')}
                 >
                     <Text style={styles.buttonText}>{hasGoals ? 'Reselect My Intentions' : 'Set My Intentions'}</Text>
                 </TouchableOpacity>
-            </ScrollView>
-        </PageContainer>
+            </PageContainer>
+        </GestureHandlerRootView>
     );
 }
 
 const styles = StyleSheet.create({
+    header: {
+        height: 60, // A standard header height
+        // backgroundColor: COLORS.white, // Can be styled later
+        // borderBottomWidth: BORDERS.width,
+        // borderBottomColor: COLORS.lightGray,
+    },
     icon: {
         alignSelf: 'center',
         marginBottom: SPACING.md,
@@ -87,6 +146,10 @@ const styles = StyleSheet.create({
         ...FONTS.h2,
         textAlign: 'center',
         marginBottom: SPACING.lg,
+        marginTop: SPACING.sm, // Adjusted for the new header
+    },
+    scrollContainer: {
+        flex: 1, // Allows the scroll view to take up the available space
     },
     goalCard: {
         backgroundColor: COLORS.white,
@@ -94,7 +157,6 @@ const styles = StyleSheet.create({
         borderRadius: BORDERS.radius,
         borderWidth: BORDERS.width * 2,
         borderColor: COLORS.lightGray,
-        marginBottom: SPACING.sm,
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -126,8 +188,21 @@ const styles = StyleSheet.create({
         borderRadius: BORDERS.radius,
         alignItems: 'center',
         marginTop: SPACING.md,
+        marginBottom: SPACING.md, // Add some margin at the bottom
     },
     buttonText: {
         ...FONTS.button,
+    },
+    deleteBox: {
+        backgroundColor: COLORS.accent,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 100,
+        borderRadius: BORDERS.radius,
+    },
+    deleteText: {
+        ...FONTS.button,
+        color: COLORS.white,
+        marginTop: SPACING.xs,
     },
 }); 

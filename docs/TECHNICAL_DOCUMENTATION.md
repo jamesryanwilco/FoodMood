@@ -51,7 +51,9 @@ The `src` directory is organized to separate concerns and improve maintainabilit
 -   **`expo-notifications`**: The app uses this library to schedule and handle local notifications for meal reminders.
     -   **Permissions**: On app startup, `App.js` requests notification permissions from the user. This is handled in the root component to ensure permissions are ready when needed.
     -   **Scheduling**: In `Step5_ReminderScreen.js`, a notification is scheduled locally after the user completes Phase 1 of a check-in. The trigger time is based on the number of minutes the user inputs. The `entryId` is passed in the notification's `data` payload.
-    -   **Handling**: `App.js` contains a listener (`addNotificationResponseReceivedListener`) that waits for a user to tap on a notification. When an interaction is detected, it uses the `entryId` from the payload to navigate the user directly to the "Complete Meal" flow (`CompleteStep1`).
+    -   **Handling**: `App.js` contains a listener (`addNotificationResponseReceivedListener`) that waits for a user to tap on a notification. When an interaction is detected, it first checks the status of the corresponding entry in `AsyncStorage`. 
+        - If the entry has already been marked 'completed', it navigates the user to the "Completed" tab on the `EntriesScreen` and displays an alert.
+        - Otherwise, it uses the `entryId` from the payload to navigate the user directly to the "Complete Meal" flow (`CompleteStep1`).
 -   **Live Timers**:
     -   In `EntriesScreen.js`, a `useEffect` hook runs an interval timer that updates every second.
     -   It calculates the time remaining for each pending entry by comparing the current time with the scheduled completion time (`phase1_completed_at` + `reminder_minutes`).
@@ -70,6 +72,10 @@ The `src` directory is organized to separate concerns and improve maintainabilit
 -   `@react-native-community/slider`: For the sliders used in the check-in process.
 -   `@react-native-segmented-control/segmented-control`: For the "Pending/Completed" tabs on the Entries screen and the date filter on the Insights screen.
 -   `uuid`, `react-native-get-random-values`: For generating unique IDs for each entry. 
+
+### Goals Management
+- `SelectGoalsScreen.js`: Allows users to select from a list of predefined goals or create their own. The screen now supports adding multiple custom goals.
+- `ViewGoalsScreen.js`: Displays the user's selected and custom goals. This screen has been enhanced with `react-native-draggable-flatlist` to allow users to reorder their selected goals via drag-and-drop. It also uses the `Swipeable` component from `react-native-gesture-handler` to enable swipe-to-delete functionality.
 
 ### Settings & Notifications
 - `SettingsScreen.js`: A new screen providing users with options to manage their preferences. It features a dark mode theme and includes toggles for notification permissions and general reminders.

@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StickyFooterLayout from '../components/StickyFooterLayout';
 import { COLORS, FONTS, SPACING, BORDERS } from '../constants/theme';
+import { PlusCircleIcon, XCircleIcon } from 'react-native-heroicons/solid';
 
 const GOALS_STORAGE_KEY = 'user_goals';
 
@@ -42,8 +43,8 @@ const goalsData = [
 export default function GoalsScreen() {
     const navigation = useNavigation();
     const [selectedGoals, setSelectedGoals] = useState([]);
-    const [customGoal, setCustomGoal] = useState('');
-    const [expandedSections, setExpandedSections] = useState({});
+    const [customGoals, setCustomGoals] = useState([]);
+    const [customGoalInput, setCustomGoalInput] = useState('');
 
     const loadGoals = async () => {
         try {
@@ -51,7 +52,14 @@ export default function GoalsScreen() {
             if (storedGoals) {
                 const { selected, custom } = JSON.parse(storedGoals);
                 setSelectedGoals(selected || []);
-                setCustomGoal(custom || '');
+                // Ensure custom goals are always an array to prevent crashes from old data formats
+                if (Array.isArray(custom)) {
+                    setCustomGoals(custom);
+                } else if (custom) { // Handle old string format by converting it to an array
+                    setCustomGoals([custom]);
+                } else {
+                    setCustomGoals([]);
+                }
             }
         } catch (e) {
             console.error('Failed to load goals.', e);
@@ -67,16 +75,20 @@ export default function GoalsScreen() {
         setSelectedGoals(newSelectedGoals);
     };
 
-    const toggleSection = (category) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [category]: !prev[category]
-        }));
+    const handleAddCustomGoal = () => {
+        if (customGoalInput.trim() !== '') {
+            setCustomGoals(prev => [...prev, customGoalInput.trim()]);
+            setCustomGoalInput('');
+        }
+    };
+
+    const handleDeleteCustomGoal = (index) => {
+        setCustomGoals(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSave = async () => {
         try {
-            const dataToStore = JSON.stringify({ selected: selectedGoals, custom: customGoal });
+            const dataToStore = JSON.stringify({ selected: selectedGoals, custom: customGoals });
             await AsyncStorage.setItem(GOALS_STORAGE_KEY, dataToStore);
             Alert.alert('Saved!', 'Your intentions have been saved.', [
                 { text: 'OK', onPress: () => navigation.goBack() }
@@ -94,48 +106,66 @@ export default function GoalsScreen() {
     );
 
     return (
-        <StickyFooterLayout footer={renderFooter()}>
-            <Text style={styles.title}>What matters most to you right now?</Text>
-            <Text style={styles.subtitle}>Choose what resonates with you. You can always change this later.</Text>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <StickyFooterLayout
+                header={<Text style={styles.title}>Select Goals</Text>}
+                footer={renderFooter()}
+            >
+                {goalsData.map(section => (
+                    <View key={section.category} style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>{section.emoji} {section.category}</Text>
+                        </View>
+                        {section.items.map(item => {
+                            const isSelected = selectedGoals.includes(item);
+                            const medalIndex = selectedGoals.indexOf(item);
+                            const medal = ['🥇', '🥈', '🥉'][medalIndex];
 
-            {goalsData.map(section => (
-                <View key={section.category} style={styles.section}>
-                    <TouchableOpacity onPress={() => toggleSection(section.category)} style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>{section.emoji} {section.category}</Text>
-                        <Text style={styles.sectionToggle}>{expandedSections[section.category] ? '−' : '+'}</Text>
-                    </TouchableOpacity>
-                    {expandedSections[section.category] && section.items.map(item => {
-                        const isSelected = selectedGoals.includes(item);
-                        const medalIndex = selectedGoals.indexOf(item);
-                        const medal = ['🥇', '🥈', '🥉'][medalIndex];
+                            return (
+                                <TouchableOpacity
+                                    key={item}
+                                    style={[styles.goalButton, isSelected && styles.goalButtonSelected]}
+                                    onPress={() => handleSelectGoal(item)}
+                                >
+                                    <View style={styles.goalContent}>
+                                        {isSelected && medal ? <Text style={styles.medal}>{medal}</Text> : null}
+                                        <Text style={[styles.goalText, isSelected && styles.goalTextSelected]}>{item}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                ))}
 
-                        return (
-                            <TouchableOpacity
-                                key={item}
-                                style={[styles.goalButton, isSelected && styles.goalButtonSelected]}
-                                onPress={() => handleSelectGoal(item)}
-                            >
-                                <View style={styles.goalContent}>
-                                    {isSelected && medal ? <Text style={styles.medal}>{medal}</Text> : null}
-                                    <Text style={[styles.goalText, isSelected && styles.goalTextSelected]}>{item}</Text>
-                                </View>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>✍️ Write your own intention</Text>
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="I want to..."
+                            placeholderTextColor={COLORS.textLight}
+                            value={customGoalInput}
+                            onChangeText={setCustomGoalInput}
+                        />
+                        <TouchableOpacity onPress={handleAddCustomGoal} style={styles.addButton}>
+                            <PlusCircleIcon color={COLORS.accent} size={32} />
+                        </TouchableOpacity>
+                    </View>
+
+                    {customGoals.map((goal, index) => (
+                        <View key={index} style={styles.customGoalChip}>
+                            <Text style={styles.customGoalText}>{goal}</Text>
+                            <TouchableOpacity onPress={() => handleDeleteCustomGoal(index)}>
+                                <XCircleIcon color={COLORS.white} size={20} />
                             </TouchableOpacity>
-                        );
-                    })}
+                        </View>
+                    ))}
                 </View>
-            ))}
-
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>✍️ Write your own intention (optional)</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="I want to..."
-                    placeholderTextColor={COLORS.textLight}
-                    value={customGoal}
-                    onChangeText={setCustomGoal}
-                />
-            </View>
-        </StickyFooterLayout>
+            </StickyFooterLayout>
+        </KeyboardAvoidingView>
     );
 }
 
@@ -143,6 +173,8 @@ const styles = StyleSheet.create({
     title: {
         ...FONTS.h2,
         textAlign: 'center',
+        padding: SPACING.md,
+        backgroundColor: COLORS.background, // Match page background
     },
     subtitle: {
         ...FONTS.body,
@@ -155,17 +187,11 @@ const styles = StyleSheet.create({
     },
     sectionHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: SPACING.sm,
     },
     sectionTitle: {
         ...FONTS.h3,
-    },
-    sectionToggle: {
-        fontSize: 28,
-        color: COLORS.primary,
-        fontWeight: '300',
     },
     goalButton: {
         backgroundColor: COLORS.white,
@@ -194,14 +220,37 @@ const styles = StyleSheet.create({
     goalTextSelected: {
         color: COLORS.white,
     },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     input: {
         ...FONTS.body,
+        flex: 1,
         backgroundColor: COLORS.white,
         paddingHorizontal: SPACING.md,
         paddingVertical: SPACING.sm,
         borderRadius: BORDERS.radius,
         borderWidth: BORDERS.width,
         borderColor: COLORS.lightGray,
+    },
+    addButton: {
+        marginLeft: SPACING.sm,
+    },
+    customGoalChip: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: COLORS.primary,
+        padding: SPACING.sm,
+        borderRadius: BORDERS.radius,
+        marginTop: SPACING.sm,
+    },
+    customGoalText: {
+        ...FONTS.body,
+        color: COLORS.white,
+        flex: 1,
+        marginRight: SPACING.sm,
     },
     saveButton: {
         backgroundColor: COLORS.accent,

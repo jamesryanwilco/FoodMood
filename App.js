@@ -7,6 +7,7 @@ import { initialize as initializeAnalytics, screen as analyticsScreen } from './
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Alert, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -67,10 +68,28 @@ export default function App() {
 
         registerForPushNotificationsAsync();
 
-        const notificationResponseListener = Notifications.addNotificationResponseReceivedListener(response => {
+        const notificationResponseListener = Notifications.addNotificationResponseReceivedListener(async response => {
           const { entryId } = response.notification.request.content.data;
           if (entryId && navigationRef.current) {
-            navigationRef.current.navigate('CompleteStep1', { entryId });
+            try {
+                const existingEntries = await AsyncStorage.getItem('pending_entries');
+                const entries = existingEntries ? JSON.parse(existingEntries) : [];
+                const entry = entries.find(e => e.id === entryId);
+
+                if (entry && entry.status === 'completed') {
+                    navigationRef.current.navigate('Main', {
+                        screen: 'Entries',
+                        params: { initialTabIndex: 1 } // Direct to "Completed" tab
+                    });
+                    Alert.alert('Already Completed', 'This meal entry has already been completed.');
+                } else {
+                    navigationRef.current.navigate('CompleteStep1', { entryId });
+                }
+            } catch (e) {
+                console.error("Failed to check entry status from notification:", e);
+                // Fallback to original behavior
+                navigationRef.current.navigate('CompleteStep1', { entryId });
+            }
           }
         });
 

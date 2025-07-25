@@ -4,7 +4,7 @@ import CheckInScreen from '../screens/CheckInScreen';
 import EntriesScreen from '../screens/EntriesScreen';
 import InsightsScreen from '../screens/InsightsScreen';
 import GuideScreen from '../screens/GuideScreen';
-import GoalsScreen from '../screens/GoalsScreen';
+import ViewGoalsScreen from '../screens/ViewGoalsScreen';
 import { PlusCircleIcon, ClipboardDocumentListIcon, ChartPieIcon, BookOpenIcon, FlagIcon } from 'react-native-heroicons/solid';
 
 const Tab = createBottomTabNavigator();
@@ -51,7 +51,7 @@ export default function MainTabNavigator() {
             <Tab.Screen name="Entries" component={EntriesScreen} />
             <Tab.Screen name="Insights" component={InsightsScreen} />
             <Tab.Screen name="Guide" component={GuideScreen} />
-            <Tab.Screen name="Goals" component={GoalsScreen} />
+            <Tab.Screen name="Goals" component={ViewGoalsScreen} />
         </Tab.Navigator>
     );
 } 

@@ -27,6 +27,7 @@
     "expo-linear-gradient": "~14.1.5",
     "expo-notifications": "~0.31.3",
     "expo-status-bar": "~2.2.3",
+    "openai": "^5.10.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "^0.79.4",

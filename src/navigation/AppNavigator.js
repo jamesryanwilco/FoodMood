@@ -16,6 +16,7 @@ import Phase2_Step2_GoalScreen from '../screens/checkin/Phase2_Step2_GoalScreen'
 import SelectGoalsScreen from '../screens/SelectGoalsScreen';
 import ViewGoalsScreen from '../screens/ViewGoalsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import ChatScreen from '../screens/ChatScreen';
 import { COLORS } from '../constants/theme';
 
 const Stack = createStackNavigator();
@@ -49,6 +50,18 @@ export default function AppNavigator() {
         options={{ 
           presentation: 'modal',
           headerShown: false, 
+        }}
+      />
+      <Stack.Screen 
+        name="Chat" 
+        component={ChatScreen} 
+        options={{
+          headerShown: true,
+          headerTitle: 'Awara Chat',
+          headerBackTitle: 'Back',
+          headerStyle: { backgroundColor: '#121212' },
+          headerTintColor: '#BB86FC',
+          headerTitleStyle: { color: '#EAEAEA' },
         }}
       />
       <Stack.Screen 

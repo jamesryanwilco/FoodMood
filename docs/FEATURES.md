@@ -18,11 +18,15 @@ This document tracks the development status of the app's core features.
     -   [✅] Modify completed entries (date, meal type, description) via an in-place modal.
 -   **Reminders & Timers:**
     -   [✅] **Notification Reminders:** Users are prompted to set a reminder (in minutes) after completing a "before eating" entry. A local notification is scheduled to remind them to complete the second part.
+    -   [✅] **Smart Notification Handling:** If a user taps a notification for an entry that has already been completed, they are gracefully redirected to the completed entries list instead of the check-in flow.
     -   [✅] **Live Countdown:** The "Pending" entries list displays a live countdown for each entry, showing the time remaining until the reminder is due.
 -   **Emotion Matrix:** A guided tool for users to identify and log their emotional state (used for both pre-meal and post-meal).
--   **Goals Screen ("Goals" Tab):**
-    -   [✅] Users can select from predefined intentions or write their own.
-    -   [✅] Goals are saved and reloaded when returning to the screen.
+-   **Goals & Intentions Screen ("Goals" Tab):**
+    -   [✅] **Streamlined Flow:** Users are taken directly to their list of current intentions.
+    -   [✅] **Interactive Goal Management:**
+        -   Drag and drop to reorder selected intentions.
+        -   Swipe right to delete an intention.
+    -   [✅] **Multiple Custom Intentions:** Users can now add and manage a list of their own custom-written intentions.
 -   **Insights Dashboard ("Insights" Tab):**
     -   [✅] **Interactive Analytics:**
         -   Display total entries, average energy boost, and top 3 energy-boosting meals.
@@ -47,6 +51,9 @@ This document tracks the development status of the app's core features.
 -   **Advanced Insights:**
     -   [ ] Visualizations (charts, graphs) showing patterns between food, mood, and energy over time.
     -   [ ] Pie chart or bar graph of eating motivations.
+-   **AI Assistant ("AwareAI"):**
+    -   [ ] Integration of a conversational AI to answer questions about mindful eating and app features.
+    -   [ ] The AI will be trained with a specific persona and knowledge base.
 
 ## 📝 Planned
 

@@ -26,10 +26,10 @@ const MealTypeButton = ({ icon, label, selected, onPress }) => (
     </TouchableOpacity>
 );
 
-export default function EntriesScreen({ navigation }) {
+export default function EntriesScreen({ navigation, route }) {
     const [pendingEntries, setPendingEntries] = useState([]);
     const [completedEntries, setCompletedEntries] = useState([]);
-    const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+    const [selectedTabIndex, setSelectedTabIndex] = useState(route.params?.initialTabIndex || 0);
     const [currentWeek, setCurrentWeek] = useState(new Date());
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingEntry, setEditingEntry] = useState(null);
@@ -54,7 +54,14 @@ export default function EntriesScreen({ navigation }) {
         }
     };
 
-    useFocusEffect(useCallback(() => { fetchAllEntries(); }, []));
+    useFocusEffect(useCallback(() => { 
+        fetchAllEntries(); 
+        if (route.params?.initialTabIndex) {
+            setSelectedTabIndex(route.params.initialTabIndex);
+            // Reset params to avoid sticky state
+            navigation.setParams({ initialTabIndex: undefined });
+        }
+    }, [route.params?.initialTabIndex]));
 
     useEffect(() => {
         const calculateTimeRemaining = () => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing, Image } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 import { Cog6ToothIcon } from 'react-native-heroicons/outline';
@@ -62,6 +62,10 @@ export default function CheckInScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.navigate('Chat')} style={styles.chatButton}>
+                    <Image source={require('../../assets/splash-icon.png')} style={styles.chatButtonIcon} />
+                    <Text style={styles.chatButtonText}>Awara Chat</Text>
+                </TouchableOpacity>
                 <TouchableOpacity onPress={handleSettingsPress} style={styles.settingsButton}>
                     <Cog6ToothIcon color={iconColor} size={28} />
                 </TouchableOpacity>
@@ -115,11 +119,35 @@ const styles = StyleSheet.create({
     header: {
         position: 'absolute',
         top: 60,
+        left: 20,
         right: 20,
         zIndex: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     settingsButton: {
         padding: 10,
+    },
+    chatButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        paddingVertical: 1,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+    },
+    chatButtonIcon: {
+        width: 40,
+        height: 40,
+        marginRight: 8,
+    },
+    chatButtonText: {
+        color: '#4A5C4D',
+        fontWeight: 'bold',
+        fontFamily: 'serif',
     },
     content: {
         flex: 1,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch, Linking, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { XMarkIcon } from 'react-native-heroicons/solid';
+import { XMarkIcon, ChatBubbleLeftRightIcon } from 'react-native-heroicons/solid';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scheduleGeneralReminder, cancelGeneralReminder } from '../services/NotificationService';
